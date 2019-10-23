@@ -1,0 +1,25 @@
+{
+	"name": "mediawiki/event-stream-config",
+	"type": "mediawiki-extension",
+	"description": "Exposes event stream config in an API endpoint.  Can also be used to expose configs via ResourceLoader",
+	"license": "GPL-2.0-or-later",
+	"require": { },
+	"require-dev": {
+		"jakub-onderka/php-parallel-lint": "1.0.0",
+		"mediawiki/mediawiki-codesniffer": "26.0.0",
+		"jakub-onderka/php-console-highlighter": "0.3.2",
+		"mediawiki/minus-x": "0.3.1",
+		"phpunit/phpunit": "4.8.*"
+	},
+	"scripts": {
+		"test": [
+			"parallel-lint . --exclude vendor",
+			"phpcs -p -s",
+			"minus-x check ."
+		],
+		"fix": [
+			"minus-x fix .",
+			"phpcbf"
+		]
+	}
+}
