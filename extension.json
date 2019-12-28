@@ -4,7 +4,7 @@
 		"Andrew Otto"
 	],
 	"url": "https://www.mediawiki.org/wiki/Extension:EventStreamConfig",
-	"descriptionmsg": "Exposes event stream config in an API endpoint.  Can also be used to expose configs via ResourceLoader",
+	"descriptionmsg": "eventstreamconfig-desc",
 	"license-name": "GPL-2.0-or-later",
 	"type": "other",
 	"requires": {
@@ -27,7 +27,7 @@
 	"config": {
 		"EventStreams": {
 			"value": [],
-			"description": "A list of individual stream configs.  Each stream config object must minimally specify its `schema_title` and its `stream` name settings.  The `stream` may either be a static stream name string, or a regex that matches stream names for which the stream config should be used."
+			"description": "A list of individual stream configs. Each stream config object must minimally specify its `schema_title` and its `stream` name settings. The `stream` may either be a static stream name string, or a regex that matches stream names for which the stream config should be used."
 		}
 	},
 	"manifest_version": 2

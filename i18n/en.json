@@ -4,7 +4,7 @@
 			"Andrew Otto"
 		]
 	},
-	"event-stream-config-desc": "Exposes event stream config in an API endpoint.  Can also be used to expose configs via ResourceLoader",
+	"eventstreamconfig-desc": "Exposes event stream config in an API endpoint. Can also be used to expose configs via ResourceLoader",
 	"apihelp-streamconfigs-summary": "Exposes event stream config",
 	"apihelp-streamconfigs-param-streams": "List of streams to get config for",
 	"apihelp-streamconfigs-param-all_settings": "Include all settings in stream config results",
