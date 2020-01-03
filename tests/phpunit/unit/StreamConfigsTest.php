@@ -34,7 +34,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		],
 	];
 
-	public function setUp() {
+	public function setUp() : void {
 		parent::setUp();
 		$options = new ServiceOptions(
 			StreamConfigs::CONSTRUCTOR_OPTIONS,
