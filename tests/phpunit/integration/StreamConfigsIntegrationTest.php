@@ -2,8 +2,8 @@
 
 namespace MediaWiki\Extension\EventStreamConfig;
 
-use MediaWikiIntegrationTestCase;
 use MediaWiki\MediaWikiServices;
+use MediaWikiIntegrationTestCase;
 
 /**
  * @covers \MediaWiki\Extension\EventStreamConfig\StreamConfigs

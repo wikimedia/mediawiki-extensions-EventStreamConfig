@@ -2,10 +2,9 @@
 
 namespace MediaWiki\Extension\EventStreamConfig;
 
-use Psr\Log\NullLogger;
-
-use MediaWikiUnitTestCase;
 use MediaWiki\Config\ServiceOptions;
+use MediaWikiUnitTestCase;
+use Psr\Log\NullLogger;
 
 /**
  * @covers \MediaWiki\Extension\EventStreamConfig\StreamConfigs

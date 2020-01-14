@@ -105,7 +105,7 @@ class StreamConfig {
 	 * Returns true if $string is a valid regex.
 	 * It must start with '/' and preg_match must not return false.
 	 *
-	 * @param  string $string
+	 * @param string $string
 	 * @return bool
 	 */
 	private static function isValidRegex( $string ) {

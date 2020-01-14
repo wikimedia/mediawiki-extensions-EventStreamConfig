@@ -1,10 +1,9 @@
 <?php
 
 use MediaWiki\Config\ServiceOptions;
+use MediaWiki\Extension\EventStreamConfig\StreamConfigs;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
-
-use MediaWiki\Extension\EventStreamConfig\StreamConfigs;
 
 return [
 	'EventStreamConfig.StreamConfigs' => function ( MediaWikiServices $services ) {

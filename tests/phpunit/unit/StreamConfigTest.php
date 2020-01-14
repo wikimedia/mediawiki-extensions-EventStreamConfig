@@ -2,8 +2,8 @@
 
 namespace MediaWiki\Extension\EventStreamConfig;
 
-use MediaWikiUnitTestCase;
 use InvalidArgumentException;
+use MediaWikiUnitTestCase;
 
 /**
  * @covers \MediaWiki\Extension\EventStreamConfig\StreamConfig
@@ -74,7 +74,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		];
 
 		$streamConfig = new StreamConfig( $settings );
-		$this->assertEquals( true, $streamConfig->matches( 'nonya' ) );
+		$this->assertTrue( $streamConfig->matches( 'nonya' ) );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		];
 
 		$streamConfig = new StreamConfig( $settings );
-		$this->assertEquals( true, $streamConfig->matches( 'mediawiki.job.workworkwork' ) );
+		$this->assertTrue( (bool)$streamConfig->matches( 'mediawiki.job.workworkwork' ) );
 	}
 
 	/**
@@ -107,7 +107,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		// Since the stream setting should be recognized as a regex, string equivalence
 		// should not be used to match the incoming target stream name, and
 		// preg_match( $regex, $regex ) will be false.
-		$this->assertEquals( false, $streamConfig->matches( '/^mediawiki\.job\..+/' ) );
+		$this->assertFalse( (bool)$streamConfig->matches( '/^mediawiki\.job\..+/' ) );
 	}
 
 	/**

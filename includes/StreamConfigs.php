@@ -3,8 +3,8 @@
 namespace MediaWiki\Extension\EventStreamConfig;
 
 use MediaWiki\Config\ServiceOptions;
-use Wikimedia\Assert\Assert;
 use Psr\Log\LoggerInterface;
+use Wikimedia\Assert\Assert;
 
 /**
  * Functions to aid in exporting event stream configs.  These configs should be set
