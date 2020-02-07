@@ -28,7 +28,8 @@ This allows for centralized configuration of streams for both Mediawiki and ext
 `$wgEventStreams` is a list of individual stream configs.  Each stream config
 must minimally specify its `schema_title` and its `stream` name settings.  In `$wgEventStreams`,
 `stream` may either be a static stream name string, or a regex that matches stream names
-for which the stream config should be used.
+for which the stream config should be used.  If using a regex, please keep them simple and
+performance safe.  Config should be easy to understand and not add ReDOS vulnerabilities.
 
 Example:
 
