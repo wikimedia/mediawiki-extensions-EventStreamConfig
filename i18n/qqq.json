@@ -1,13 +1,14 @@
 {
 	"@metadata": {
 		"authors": [
-			"Andrew Otto"
+			"Andrew Otto",
+			"Umherirrender"
 		]
 	},
 	"eventstreamconfig-desc": "{{desc|name=EventStreamConfig|url=https://www.mediawiki.org/wiki/Extension:EventStreamConfig}}",
-	"apihelp-streamconfigs-summary": "Exposes event stream config",
-	"apihelp-streamconfigs-param-streams": "List of streams to get config for",
-	"apihelp-streamconfigs-param-all_settings": "Include all settings in stream config results",
-	"apihelp-streamconfigs-example-1": "Get stream configs for a list of streams",
-	"apihelp-streamconfigs-example-2": "Get stream config for a streams with all settings"
+	"apihelp-streamconfigs-summary": "{{doc-apihelp-summary|streamconfigs}}",
+	"apihelp-streamconfigs-param-streams": "{{doc-apihelp-param|streamconfigs|streams}}",
+	"apihelp-streamconfigs-param-all_settings": "{{doc-apihelp-param|streamconfigs|all_settings}}",
+	"apihelp-streamconfigs-example-1": "{{doc-apihelp-example|streamconfigs}}",
+	"apihelp-streamconfigs-example-2": "{{doc-apihelp-example|streamconfigs}}"
 }
