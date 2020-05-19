@@ -12,7 +12,7 @@ use Psr\Log\NullLogger;
  */
 class StreamConfigsTest extends MediaWikiUnitTestCase {
 
-	const STREAM_CONFIGS_FIXTURE = [
+	private const STREAM_CONFIGS_FIXTURE = [
 		[
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
