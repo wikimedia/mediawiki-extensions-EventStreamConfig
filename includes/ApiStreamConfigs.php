@@ -29,6 +29,23 @@ class ApiStreamConfigs extends ApiBase {
 	private const API_PARAM_STREAMS = 'streams';
 
 	/**
+	 * API query param used to restrict stream config entry results to
+	 * those that have settings that match these constraints.
+	 * This is expected to be given as a multi array of key=val pairs.  E.g.
+	 *   constraints=event_service_name=eventgate-main|other_setting=other_value
+	 * This would be parsed into
+	 * @code
+	 *   [
+	 *       'event_service_name' => 'eventgate-main',
+	 *       'other_setting' => 'other_value'
+	 *   ]
+	 * @endcode
+	 *
+	 * And be used to filter for stream config entries that have these settings.
+	 */
+	private const API_PARAM_CONSTRAINTS = 'constraints';
+
+	/**
 	 * By default, StreamConfigs#get will only return settings for streams
 	 * that are not blacklisted in StreamConfig::INTERNAL_SETTINGS.
 	 * Specifying the all_settings parameter will have it return
@@ -44,6 +61,11 @@ class ApiStreamConfigs extends ApiBase {
 		$this->getMain()->setCacheMaxAge( self::CACHE_MAX_AGE );
 
 		$targetStreams = $this->getParameter( self::API_PARAM_STREAMS );
+
+		$settingsConstraints = self::multiParamToAssocArray(
+			$this->getParameter( self::API_PARAM_CONSTRAINTS )
+		);
+
 		$includeAllSettings = $this->getParameter( self::API_PARAM_ALL_SETTINGS );
 
 		$streamConfigs = MediaWikiServices::getInstance()->getService(
@@ -51,7 +73,11 @@ class ApiStreamConfigs extends ApiBase {
 		);
 
 		$this->getResult()->addValue(
-			null, "streams", $streamConfigs->get( $targetStreams, $includeAllSettings )
+			null, "streams", $streamConfigs->get(
+				$targetStreams,
+				$includeAllSettings,
+				$settingsConstraints
+			)
 		);
 	}
 
@@ -61,6 +87,9 @@ class ApiStreamConfigs extends ApiBase {
 	public function getAllowedParams() {
 		return [
 			self::API_PARAM_STREAMS => [
+				ApiBase::PARAM_ISMULTI => true,
+			],
+			self::API_PARAM_CONSTRAINTS => [
 				ApiBase::PARAM_ISMULTI => true,
 			],
 			self::API_PARAM_ALL_SETTINGS => [
@@ -75,11 +104,17 @@ class ApiStreamConfigs extends ApiBase {
 	protected function getExamplesMessages() {
 		return [
 			'action=streamconfigs&' . self::API_PARAM_STREAMS .
-				'=mediawiki.page-view|mediawiki.button-click' =>
+			'=mediawiki.page-view|mediawiki.button-click' =>
 					'apihelp-streamconfigs-example-1',
+
 			'action=streamconfigs&' . self::API_PARAM_STREAMS .
-				'=mediawiki.button-click&' . self::API_PARAM_ALL_SETTINGS  =>
-					'apihelp-streamconfigs-example-2'
+			'=mediawiki.button-click&' . self::API_PARAM_ALL_SETTINGS  =>
+					'apihelp-streamconfigs-example-2',
+
+			'action=streamconfigs&' . self::API_PARAM_STREAMS .
+			'=mediawiki.button-click&' . self::API_PARAM_ALL_SETTINGS .
+			'&constraints=event_service_name=eventgate-main|sample_rate=0.5' =>
+					'apihelp-streamconfigs-example-3',
 		];
 	}
 
@@ -88,5 +123,36 @@ class ApiStreamConfigs extends ApiBase {
 	 */
 	public function getHelpUrls() {
 		return 'https://www.mediawiki.org/wiki/Extension:EventStreamConfig';
+	}
+
+	/**
+	 * Parses a MULTI PARAM value into an assoc array.
+	 * Example:
+	 *   my_param=key1=val1|key2=val2
+	 * If $this->getParameter( 'my_param' ) is passed, this function will return
+	 * @code
+	 *   [
+	 *       'key1' => 'val1',
+	 *       'key2' => 'val2',
+	 *   ]
+	 * @endcode
+	 *
+	 * @param array $multiParamArray List of key=val string pairs
+	 * @param string $seperator separator to use when splitting key,value pairs.  Default: =
+	 * @return array
+	 */
+	private static function multiParamToAssocArray(
+		array $multiParamArray,
+		string $seperator = '='
+	) {
+		return array_reduce(
+			$multiParamArray,
+			function ( $carry, $elementString ) {
+				list( $key, $val ) = explode( $separator, $elementString );
+				$carry[$key] = $val;
+				return $carry;
+			},
+			[]
+		);
 	}
 }

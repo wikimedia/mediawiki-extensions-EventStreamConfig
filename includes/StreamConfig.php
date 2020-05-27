@@ -90,7 +90,7 @@ class StreamConfig {
 	}
 
 	/**
-	 * True if this StreamConfig applies for $streamName, false otherwise.
+	 * True if this StreamConfig applies for $stream, false otherwise.
 	 *
 	 * @param string $stream name of stream to match
 	 * @return bool
@@ -99,6 +99,32 @@ class StreamConfig {
 		return $this->streamIsRegex ?
 			preg_match( $this->stream(), $stream ) :
 			( $this->stream() === $stream );
+	}
+
+	/**
+	 * True if this StreamConfig has all of the given $settingsConstraints.
+	 * If 'stream' is given as a constraint, it be matched against this
+	 * StreamConfig's stream name via $this->matches.
+	 *
+	 * @param array $settingsConstraints
+	 * @return bool
+	 */
+	public function matchesSettings( $settingsConstraints ) {
+		if ( isset( $settingsConstraints[self::STREAM_SETTING] ) ) {
+			if ( !$this->matches( $settingsConstraints[self::STREAM_SETTING] ) ) {
+				return false;
+			}
+			// stream matching is special and can't use array_intersec_assoc.
+			// Since we've already matched stream, remove it from the constraints now.
+			unset( $settingsConstraints[self::STREAM_SETTING] );
+		}
+
+		// The intersection of this StreamConfig settings and the constraints
+		// should return exactly the constraints if this StreamConfig matches them.
+		return array_intersect_assoc(
+			$settingsConstraints,
+			$this->settings
+		) == $settingsConstraints;
 	}
 
 	/**

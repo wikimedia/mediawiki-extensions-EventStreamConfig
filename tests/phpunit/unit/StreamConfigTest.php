@@ -150,4 +150,61 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->expectException( InvalidArgumentException::class );
 		new StreamConfig( $settings );
 	}
+
+	/**
+	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
+	 */
+	public function testMatchesSettings() {
+		$settings = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'sample_rate' => 0.5,
+			'EventServiceName' => 'eventgate-analytics',
+		];
+
+		$constraints = [
+			'EventServiceName' => 'eventgate-analytics',
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
+	 */
+	public function testNotMatchesSettings() {
+		$settings = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'sample_rate' => 0.5,
+			'EventServiceName' => 'eventgate-analytics',
+		];
+
+		$constraints = [
+			'EventServiceName' => 'eventgate-main',
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertFalse( $streamConfig->matchesSettings( $constraints ) );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
+	 */
+	public function testMatchesSettingsStreamRegex() {
+		$settings = [
+			'stream' => '/^mediawiki\.job\..+/',
+			'schema_title' => 'mediawiki/job',
+			'EventServiceName' => 'eventgate-main',
+		];
+
+		$constraints = [
+			'stream' => 'mediawiki.job.workworkwork',
+			'EventServiceName' => 'eventgate-main',
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
+	}
 }

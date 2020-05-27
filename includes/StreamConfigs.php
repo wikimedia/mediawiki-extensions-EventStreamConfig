@@ -79,17 +79,28 @@ class StreamConfigs {
 	 *
 	 * @param array|null $targetStreams
 	 *     List of stream names. If not provided, all stream configs will be returned.
-	 *
 	 * @param bool $includeAllSettings
 	 *     If $includeAllSettings is false, only setting keys that match those in
 	 *     StreamConfig::SETTINGS_FOR_EXPORT will be returned.
+	 * @param array|null $settingsConstraints
+	 *     If given, returned stream config entries will be filtered for those that
+	 *     have these settings.
 	 *
 	 * @return array
 	 */
-	public function get( array $targetStreams = null, $includeAllSettings = false ): array {
+	public function get(
+		array $targetStreams = null,
+		$includeAllSettings = false,
+		array $settingsConstraints = null
+	): array {
 		$result = [];
 		foreach ( $this->selectByStreams( $targetStreams ) as $stream => $streamConfigEntry ) {
-			$result[$stream] = $streamConfigEntry->toArray( $includeAllSettings );
+			if (
+				!$settingsConstraints ||
+				$streamConfigEntry->matchesSettings( $settingsConstraints )
+			) {
+				$result[$stream] = $streamConfigEntry->toArray( $includeAllSettings );
+			}
 		}
 		return $result;
 	}

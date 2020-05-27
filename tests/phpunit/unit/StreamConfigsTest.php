@@ -51,6 +51,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			[
 				[ 'nonya' ],
 				false,
+				null,
 				[
 					'nonya' => [
 						'sample_rate' => 0.5,
@@ -62,6 +63,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			[
 				[ 'nonya', 'test.event' ],
 				false,
+				null,
 				[
 					'nonya' => [
 						'sample_rate' => 0.5,
@@ -76,6 +78,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			[
 				[ 'nonya', 'mediawiki.job.A', 'mediawiki.job.B' ],
 				false,
+				null,
 				[
 					'nonya' => [
 						'sample_rate' => 0.5,
@@ -93,6 +96,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			[
 				[ 'nonya', 'mediawiki.job.workworkwork' ],
 				true,
+				null,
 				[
 					'nonya' => [
 						'stream' => 'nonya',
@@ -113,6 +117,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			[
 				null,
 				true,
+				null,
 				[
 					'nonya' => [
 						'stream' => 'nonya',
@@ -142,8 +147,52 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			[
 				[ 'unconfigured-stream-name' ],
 				false,
+				null,
 				[],
 				'get an unconfigured stream name'
+			],
+
+			[
+				null,
+				true,
+				[
+					'EventServiceName' => 'eventgate-main',
+				],
+				[
+					'test.event' => [
+						'stream' => 'test.event',
+						'schema_title' => 'test/event',
+						'sample_rate' => 1.0,
+						'EventServiceName' => 'eventgate-main',
+					],
+					// Since we aren't asking for any specific streams,
+					// we will get this config keyed by its regex stream,
+					// pattern rather than a specific stream name.
+					'/^mediawiki\.job\..+/' => [
+						'stream' => '/^mediawiki\.job\..+/',
+						'schema_title' => 'mediawiki/job',
+						'sample_rate' => 0.8,
+						'EventServiceName' => 'eventgate-main',
+					]
+				],
+				'get all streams that have matching constraints'
+			],
+
+			[
+				[ 'mediawiki.job.workworkwork' ],
+				true,
+				[
+					'EventServiceName' => 'eventgate-main',
+				],
+				[
+					'mediawiki.job.workworkwork' => [
+						'stream' => '/^mediawiki\.job\..+/',
+						'schema_title' => 'mediawiki/job',
+						'sample_rate' => 0.8,
+						'EventServiceName' => 'eventgate-main',
+					]
+				],
+				'get all streams that have matching stream names and constraints'
 			],
 		];
 	}
@@ -151,8 +200,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 	/**
 	 * @dataProvider streamConfigsGetProvider
 	 */
-	public function testGet( $targetStreams, $allSettings, $expected, $message ) {
-		$result = $this->streamConfigs->get( $targetStreams, $allSettings );
+	public function testGet( $targetStreams, $allSettings, $constraints, $expected, $message ) {
+		$result = $this->streamConfigs->get( $targetStreams, $allSettings, $constraints );
 		$this->assertEquals( $expected, $result, $message );
 	}
+
 }
