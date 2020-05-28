@@ -99,7 +99,7 @@ class StreamConfigs {
 				!$settingsConstraints ||
 				$streamConfigEntry->matchesSettings( $settingsConstraints )
 			) {
-				$result[$stream] = $streamConfigEntry->toArray( $includeAllSettings );
+				$result[$stream] = $streamConfigEntry->toArray( $includeAllSettings, $stream );
 			}
 		}
 		return $result;

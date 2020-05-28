@@ -54,9 +54,29 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'schema_title' => 'mediawiki/nonya',
 			'sample_rate' => 0.5,
 			'EventServiceName' => 'eventgate-analytics',
+			'topics' => [ 'nonya' ],
 		];
 
 		$expected = $settings;
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals( $expected, $streamConfig->toArray( true ) );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::toArray()
+	 */
+	public function testToArrayWithTopicPrefixesAllSettings() {
+		$settings = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'sample_rate' => 0.5,
+			'EventServiceName' => 'eventgate-analytics',
+			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+		];
+
+		$expected = $settings;
+		$expected['topics'] = [ 'eqiad.nonya', 'codfw.nonya' ];
 
 		$streamConfig = new StreamConfig( $settings );
 		$this->assertEquals( $expected, $streamConfig->toArray( true ) );
@@ -207,4 +227,124 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$streamConfig = new StreamConfig( $settings );
 		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
 	}
+
+	public function testTopicsWithExplicitTopicsSetting() {
+		$settings = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'sample_rate' => 0.5,
+			'EventServiceName' => 'eventgate-analytics',
+			'topics' => [ 'eqiad.nonya', 'codfw.nonya' ],
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals( $streamConfig->topics(), $settings['topics'] );
+	}
+
+	public function testTopicsWithoutTopicPrefixes() {
+		$settings = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'sample_rate' => 0.5,
+			'EventServiceName' => 'eventgate-analytics',
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals( $streamConfig->topics(), [ 'nonya' ] );
+	}
+
+	public function testTopicsWithTopicPrefixes() {
+		$settings = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'sample_rate' => 0.5,
+			'EventServiceName' => 'eventgate-analytics',
+			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals( $streamConfig->topics(), [ 'eqiad.nonya', 'codfw.nonya' ] );
+	}
+
+	public function testTopicsStreamRegexSettingWithoutTopicPrefixes() {
+		$settings = [
+			'stream' => '/^mediawiki\.job\..+/',
+			'schema_title' => 'mediawiki/job',
+			'EventServiceName' => 'eventgate-main',
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals( $streamConfig->topics(), [ $settings['stream'] ] );
+	}
+
+	public function testTopicsStreamRegexSettingWithTopicPrefixes() {
+		$settings = [
+			'stream' => '/^mediawiki\.job\..+/',
+			'schema_title' => 'mediawiki/job',
+			'EventServiceName' => 'eventgate-main',
+			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals( $streamConfig->topics(), [ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ] );
+	}
+
+	public function testTopicsTargetStreamNameWithoutTopicPrefixes() {
+		$settings = [
+			'stream' => '/^mediawiki\.job\..+/',
+			'schema_title' => 'mediawiki/job',
+			'EventServiceName' => 'eventgate-main',
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals(
+			$streamConfig->topics( 'mediawiki.job.workworkwork' ),
+			[ 'mediawiki.job.workworkwork' ]
+		);
+	}
+
+	public function testTopicsTargetStreamNameWithTopicPrefixes() {
+		$settings = [
+			'stream' => '/^mediawiki\.job\..+/',
+			'schema_title' => 'mediawiki/job',
+			'EventServiceName' => 'eventgate-main',
+			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals(
+			$streamConfig->topics( 'mediawiki.job.workworkwork' ),
+			[ 'eqiad.mediawiki.job.workworkwork', 'codfw.mediawiki.job.workworkwork' ]
+		);
+	}
+
+	public function testTopicsTargetStreamRegexWithoutTopicPrefixes() {
+		$settings = [
+			'stream' => '/^mediawiki\.job\..+/',
+			'schema_title' => 'mediawiki/job',
+			'EventServiceName' => 'eventgate-main',
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals(
+			$streamConfig->topics( '/^mediawiki\.job\..+/' ),
+			[ '/^mediawiki\.job\..+/' ]
+		);
+	}
+
+	public function testTopicsTargetStreamRegexWithTopicPrefixes() {
+		$settings = [
+			'stream' => '/^mediawiki\.job\..+/',
+			'schema_title' => 'mediawiki/job',
+			'EventServiceName' => 'eventgate-main',
+			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertEquals(
+			$streamConfig->topics( '/^mediawiki\.job\..+/' ),
+			[ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ]
+		);
+	}
+
 }

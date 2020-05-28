@@ -16,6 +16,20 @@ class StreamConfig {
 	private const STREAM_SETTING = 'stream';
 
 	/**
+	 * Streams can be made up of multiple topics.  If
+	 * topic_prefixes are set, the topics will default to be
+	 * the stream name with these prefixes.
+	 * @var array
+	 */
+	private const TOPIC_PREFIXES_SETTING = 'topic_prefixes';
+
+	/**
+	 * Streams can be made up of multiple topics.
+	 * @var array
+	 */
+	private const TOPICS_SETTING = 'topics';
+
+	/**
 	 * Blacklist of setting names that don't usually need to be included
 	 * in config request results.  Not shipping irrelevant settings to
 	 * client side saves on bytes transferred.
@@ -23,8 +37,12 @@ class StreamConfig {
 	 */
 	private const INTERNAL_SETTINGS = [
 		self::STREAM_SETTING,
+		self::TOPIC_PREFIXES_SETTING,
+		self::TOPICS_SETTING,
+		// Being deprecated in favor of destination_event_service_name
 		'EventServiceName',
-		'schema_title',
+		'destination_event_service_name',
+		'schema_title'
 	];
 
 	/**
@@ -72,15 +90,96 @@ class StreamConfig {
 	}
 
 	/**
+	 * Returns a list of topics that compose the $stream.
+	 * If a target $stream is not provided, $stream will default to the value of
+	 * $this->stream(), which is this StreamConfig's stream setting.
+	 *
+	 * - If self::TOPICS_SETTING is set, this will be returned as is.
+	 * - Else if self::TOPIC_PREFIXES_SETTING is not set, then [$stream] will be returned.
+	 * - Else if $stream is a regex, it will be modified to include the prefixes in the regex.
+	 * - Else a list of topics with the prefixes will be returned.
+	 *
+	 * @param string|null $stream
+	 * @return array
+	 */
+	public function topics( $stream = null ): array {
+		// if $stream was provided, it could be an explicit target stream name
+		// OR a regex stream setting.  $this->stream() could also be either, but in the
+		// case where it is a regex, a user might want to provide an explicit stream name
+		// to get topics rather than this StreamConfig's regex stream setting.
+		// Default to using the StreamConfig stream setting otherwise.
+		if ( !$stream ) {
+			$stream = $this->stream();
+		}
+
+		if ( isset( $this->settings[self::TOPICS_SETTING] ) ) {
+			// If this stream was configured with specific topics, just return those.
+			return $this->settings[self::TOPICS_SETTING];
+		} elseif ( !isset( $this->settings[self::TOPIC_PREFIXES_SETTING] ) ) {
+			// Else if this stream does not has topic prefixes, just return the
+			// stream name as the topic.
+			return [ $stream ];
+		} else {
+			$topicPrefixes = $this->settings[self::TOPIC_PREFIXES_SETTING];
+
+			if ( self::isValidRegex( $stream ) ) {
+				// This is a regex string stream name, return a regex with the prefixes.
+
+				// Remove the regex boundry chars.
+				$streamPattern = trim( $stream, '/' );
+
+				// If the regex starts with ^, save it for later.
+				$beginAnchor = '';
+				if ( startsWith( $streamPattern, '^' ) ) {
+					$beginAnchor = '^';
+					$streamPattern = substr( $streamPattern, 1 );
+				}
+
+				// Escape any regex looking chars in the prefixes
+				$topicPrefixes = array_map( "preg_quote", $topicPrefixes );
+
+				// Reconstruct the regex with prefixes, e.g.
+				// /^(eqiad.|codfw.)
+				return [
+					'/' . $beginAnchor .
+					'(' . implode( '|', $topicPrefixes ) . ')' . $streamPattern .
+					'/'
+				];
+			} else {
+				// Else prefix the stream with each topic prefix.
+				// If $stream is a regex string, then we need to alter the
+				// regex to prefix safely inside the regex string.
+				return array_map(
+					function ( $topicPrefix ) use ( $stream ) {
+						return $topicPrefix . $stream;
+					},
+					$topicPrefixes
+				);
+			}
+		}
+	}
+
+	/**
 	 * Returns this StreamConfig as an array of settings.
+	 * self::TOPICS_SETTING is set to the value returned by $this->topics($targetStream)
+	 * if self::TOPICS_SETTING is not explicitly set.
 	 *
 	 * @param bool $includeAllSettings
 	 *        If false, the settings in INTERNAL_SETTINGS
 	 *        will be excluded.  Default: false.
+	 *
+	 * @param string|null $targetStream
+	 *        If given, this will be used to get topics, otherwise $this->stream()
+	 *        will be used (which could be a regex stream pattern).
+	 *
 	 * @return array
 	 */
-	public function toArray( $includeAllSettings = false ): array {
+	public function toArray( $includeAllSettings = false, $targetStream = null ): array {
 		$settings = $this->settings;
+
+		// If TOPICS_SETTING is already set explicitly in the settings,
+		// $this->topics() will just return it.
+		$settings[self::TOPICS_SETTING] = $this->topics( $targetStream );
 
 		if ( !$includeAllSettings ) {
 			$settings = array_diff_key( $settings, array_flip( self::INTERNAL_SETTINGS ) );
@@ -166,6 +265,21 @@ class StreamConfig {
 				self::isValidRegex( $stream ), self::STREAM_SETTING, "Invalid regex '$stream'"
 			);
 		}
-	}
 
+		if ( isset( $settings[self::TOPIC_PREFIXES_SETTING] ) ) {
+			Assert::parameterType(
+				'array',
+				$settings[self::TOPIC_PREFIXES_SETTING],
+				self::TOPIC_PREFIXES_SETTING
+			);
+		}
+
+		if ( isset( $settings[self::TOPICS_SETTING] ) ) {
+			Assert::parameterType(
+				'array',
+				$settings[self::TOPICS_SETTING],
+				self::TOPICS_SETTING
+			);
+		}
+	}
 }

@@ -23,6 +23,7 @@ class StreamConfigsIntegrationTest extends MediaWikiIntegrationTestCase {
 			'schema_title' => 'test/event',
 			'sample_rate' => 1.0,
 			'EventServiceName' => 'eventgate-main',
+			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 		],
 		[
 			'stream' => '/^mediawiki\.job\..+/',
