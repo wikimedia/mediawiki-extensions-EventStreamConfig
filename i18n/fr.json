@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Gomoko",
+			"Wladek92",
 			"Zetud"
 		]
 	},
@@ -10,5 +11,5 @@
 	"apihelp-streamconfigs-param-streams": "Liste des flux pour lesquels obtenir la configuration",
 	"apihelp-streamconfigs-param-all_settings": "Inclure tous les paramètres dans les résultats de configuration du flux",
 	"apihelp-streamconfigs-example-1": "Obtenir les configurations de flux pour une liste de flux",
-	"apihelp-streamconfigs-example-2": "Obtenir la configuration de flux pour un flux avec tous ses paramètres"
+	"apihelp-streamconfigs-example-2": "Obtenir la configuration de flux pour les flux avec tous les paramètres"
 }
