@@ -61,12 +61,10 @@ class ApiStreamConfigs extends ApiBase {
 		$this->getMain()->setCacheMaxAge( self::CACHE_MAX_AGE );
 
 		$targetStreams = $this->getParameter( self::API_PARAM_STREAMS );
-
-		$settingsConstraints = self::multiParamToAssocArray(
-			$this->getParameter( self::API_PARAM_CONSTRAINTS )
-		);
-
 		$includeAllSettings = $this->getParameter( self::API_PARAM_ALL_SETTINGS );
+		$constraints = $this->getParameter( self::API_PARAM_CONSTRAINTS );
+
+		$settingsConstraints = $constraints ? self::multiParamToAssocArray( $constraints ) : null;
 
 		$streamConfigs = MediaWikiServices::getInstance()->getService(
 			'EventStreamConfig.StreamConfigs'
@@ -138,16 +136,16 @@ class ApiStreamConfigs extends ApiBase {
 	 * @endcode
 	 *
 	 * @param array $multiParamArray List of key=val string pairs
-	 * @param string $seperator separator to use when splitting key,value pairs.  Default: =
+	 * @param string $separator Separator to use when splitting key,value pairs.  Default: =
 	 * @return array
 	 */
 	private static function multiParamToAssocArray(
 		array $multiParamArray,
-		string $seperator = '='
+		string $separator = '='
 	) {
 		return array_reduce(
 			$multiParamArray,
-			function ( $carry, $elementString ) {
+			function ( $carry, $elementString ) use ( $separator ) {
 				list( $key, $val ) = explode( $separator, $elementString );
 				$carry[$key] = $val;
 				return $carry;
