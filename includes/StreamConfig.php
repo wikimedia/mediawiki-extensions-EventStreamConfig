@@ -130,7 +130,7 @@ class StreamConfig {
 
 				// If the regex starts with ^, save it for later.
 				$beginAnchor = '';
-				if ( startsWith( $streamPattern, '^' ) ) {
+				if ( substr( $streamPattern, 0, 1 ) === '^' ) {
 					$beginAnchor = '^';
 					$streamPattern = substr( $streamPattern, 1 );
 				}
