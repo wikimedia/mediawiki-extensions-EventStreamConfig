@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Piramidion"
+			"Piramidion",
+			"Ата"
 		]
 	},
 	"eventstreamconfig-desc": "Розкриває конфігурацію потоку подій у кінцевій точці API. Також може використовуватись для розкриття конфігурацій через ResourceLoader",
@@ -9,5 +10,6 @@
 	"apihelp-streamconfigs-param-streams": "Список потоків, для яких слід отримати конфігурацію",
 	"apihelp-streamconfigs-param-all_settings": "Включити всі налаштування в результати конфігурації потоку",
 	"apihelp-streamconfigs-example-1": "Отримати конфігурації потоків для списку потоків",
-	"apihelp-streamconfigs-example-2": "Отримати конфігурації потоків для потоків з усіма налаштуваннями"
+	"apihelp-streamconfigs-example-2": "Отримати конфігурації потоків для потоків з усіма налаштуваннями",
+	"apihelp-streamconfigs-example-3": "Отримати конфігурації потоків з налаштуваннями, що співпадають з цими обмеженнями"
 }
