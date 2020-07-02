@@ -48,7 +48,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	/**
 	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::toArray()
 	 */
-	public function testToArrayAllSettings() {
+	public function testToArrayAllSettingsWithDefaults() {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
@@ -57,9 +57,13 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'topics' => [ 'nonya' ],
 		];
 
-		$expected = $settings;
+		$defaultSettings = [
+			'is_active' => true
+		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$expected = $settings + $defaultSettings;
+
+		$streamConfig = new StreamConfig( $settings, $defaultSettings );
 		$this->assertEquals( $expected, $streamConfig->toArray( true ) );
 	}
 

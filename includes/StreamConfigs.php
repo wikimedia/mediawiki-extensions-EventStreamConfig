@@ -40,6 +40,7 @@ class StreamConfigs {
 	 */
 	public const CONSTRUCTOR_OPTIONS = [
 		'EventStreams',
+		'EventStreamsDefaultSettings'
 	];
 
 	/**
@@ -55,7 +56,7 @@ class StreamConfigs {
 
 	/**
 	 * Constructs a new StreamConfigs instance initialized
-	 * from $options->get( 'EventStreams' ).
+	 * from wgEventStreams and wgEventStreamsDefaultSettings
 	 *
 	 * @param ServiceOptions $options
 	 * @param LoggerInterface $logger
@@ -64,11 +65,13 @@ class StreamConfigs {
 		$options->assertRequiredOptions( self::CONSTRUCTOR_OPTIONS );
 
 		$streamConfigsArray = $options->get( 'EventStreams' );
-
 		Assert::parameterType( 'array', $streamConfigsArray, 'EventStreams' );
 
+		$defaultSettings = $options->get( 'EventStreamsDefaultSettings' );
+		Assert::parameterType( 'array', $defaultSettings, 'EventStreamsDefaultSettings' );
+
 		foreach ( $streamConfigsArray as $streamConfig ) {
-			$this->streamConfigEntries[] = new StreamConfig( $streamConfig );
+			$this->streamConfigEntries[] = new StreamConfig( $streamConfig, $defaultSettings );
 		}
 
 		$this->logger = $logger;

@@ -33,12 +33,17 @@ class StreamConfigsIntegrationTest extends MediaWikiIntegrationTestCase {
 		],
 	];
 
+	private const STREAM_CONFIG_DEFAULT_SETTINGS_FIXTURE = [
+		'topic_prefixes' => [ 'eqiad.', 'codfw.' ]
+	];
+
 	/**
 	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfigs::__construct()
 	 */
 	public function testMediaWikiServiceIntegration() {
 		$this->setMwGlobals( [
-			'wgEventStreams' => self::STREAM_CONFIGS_FIXTURE
+			'wgEventStreams' => self::STREAM_CONFIGS_FIXTURE,
+			'wgEventStreamsDefaultSettings' => self::STREAM_CONFIG_DEFAULT_SETTINGS_FIXTURE,
 		] );
 
 		$streamConfigs = MediaWikiServices::getInstance()->getService(

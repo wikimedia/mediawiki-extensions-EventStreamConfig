@@ -73,10 +73,12 @@ class StreamConfig {
 	 *               "EventServiceName" => "eventgate-analytics-public",
 	 *           ...
 	 *        ]
+	 * @param array $defaultSettings
+	 *        An array with default stream config settings.
 	 */
-	public function __construct( array $settings ) {
-		self::validate( $settings );
-		$this->settings = $settings;
+	public function __construct( array $settings, array $defaultSettings = [] ) {
+		$this->settings = $settings + $defaultSettings;
+		self::validate( $this->settings );
 
 		$this->streamIsRegex = self::isValidRegex( $this->stream() );
 	}

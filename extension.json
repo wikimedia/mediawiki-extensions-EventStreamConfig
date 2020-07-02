@@ -28,6 +28,11 @@
 		"EventStreams": {
 			"value": [],
 			"description": "A list of individual stream configs. Each stream config object must minimally specify its `schema_title` and its `stream` name settings. The `stream` may either be a static stream name string, or a regex that matches stream names for which the stream config should be used."
+		},
+		"EventStreamsDefaultSettings": {
+			"value": {},
+			"description": "Stream config default settings. Any setting here will be set in each entry in EventStreams if it is not set there already."
+
 		}
 	},
 	"manifest_version": 2
