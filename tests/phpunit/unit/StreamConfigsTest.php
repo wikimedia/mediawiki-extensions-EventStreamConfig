@@ -18,13 +18,24 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			'schema_title' => 'mediawiki/nonya',
 			'sample_rate' => 0.5,
 			'EventServiceName' => 'eventgate-analytics',
+			// explicit topics
+			'topics' => [ 'nonya_topic' ]
+		],
+		[
+			'stream' => 'eventlogging_Test',
+			'schema_title' => 'analytics/legacy/test',
+			'sample_rate' => 1.0,
+			'EventServiceName' => 'eventgate-analytics',
+			// does not use topic prefixes, topic will be stream name
+			'topic_prefixes' => null,
 		],
 		[
 			'stream' => 'test.event',
 			'schema_title' => 'test/event',
 			'sample_rate' => 1.0,
 			'EventServiceName' => 'eventgate-main',
-			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+			// overridden topic prefixes, should not use defaults
+			'topic_prefixes' => [ 'dc1.', 'dc2.' ],
 		],
 		[
 			'stream' => '/^mediawiki\.job\..+/',
@@ -34,11 +45,18 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		],
 	];
 
+	private const STREAM_CONFIG_DEFAULT_SETTINGS_FIXTURE = [
+		'topic_prefixes' => [ 'eqiad.', 'codfw.' ]
+	];
+
 	public function setUp() : void {
 		parent::setUp();
 		$options = new ServiceOptions(
 			StreamConfigs::CONSTRUCTOR_OPTIONS,
-			[ 'EventStreams' => self::STREAM_CONFIGS_FIXTURE ]
+			[
+				'EventStreams' => self::STREAM_CONFIGS_FIXTURE,
+				'EventStreamsDefaultSettings' => self::STREAM_CONFIG_DEFAULT_SETTINGS_FIXTURE
+			]
 		);
 		$logger = new NullLogger();
 
@@ -50,14 +68,19 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		return [
 
 			[
+				// targetStreams
 				[ 'nonya' ],
+				// allSettings
 				false,
+				// constrains
 				null,
+				// expected
 				[
 					'nonya' => [
 						'sample_rate' => 0.5,
 					]
 				],
+				// test message
 				'get by specific stream'
 			],
 
@@ -104,14 +127,19 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 						'schema_title' => 'mediawiki/nonya',
 						'sample_rate' => 0.5,
 						'EventServiceName' => 'eventgate-analytics',
-						'topics' => [ 'nonya' ],
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [ 'nonya_topic' ],
 					],
 					'mediawiki.job.workworkwork' => [
 						'stream' => '/^mediawiki\.job\..+/',
 						'schema_title' => 'mediawiki/job',
 						'sample_rate' => 0.8,
 						'EventServiceName' => 'eventgate-main',
-						'topics' => [ 'mediawiki.job.workworkwork' ],
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [
+							'eqiad.mediawiki.job.workworkwork',
+							'codfw.mediawiki.job.workworkwork'
+						],
 					]
 				],
 				'get by regex streams with all settings'
@@ -127,15 +155,25 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 						'schema_title' => 'mediawiki/nonya',
 						'sample_rate' => 0.5,
 						'EventServiceName' => 'eventgate-analytics',
-						'topics' => [ 'nonya' ],
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [ 'nonya_topic' ],
+					],
+					'eventlogging_Test' => [
+						'stream' => 'eventlogging_Test',
+						'schema_title' => 'analytics/legacy/test',
+						'sample_rate' => 1.0,
+						'EventServiceName' => 'eventgate-analytics',
+						// does not use topic prefixes, topic will be stream name
+						'topic_prefixes' => null,
+						'topics' => [ 'eventlogging_Test' ],
 					],
 					'test.event' => [
 						'stream' => 'test.event',
 						'schema_title' => 'test/event',
 						'sample_rate' => 1.0,
 						'EventServiceName' => 'eventgate-main',
-						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
-						'topics' => [ 'eqiad.test.event', 'codfw.test.event' ],
+						'topic_prefixes' => [ 'dc1.', 'dc2.' ],
+						'topics' => [ 'dc1.test.event', 'dc2.test.event' ],
 					],
 					// Since we aren't asking for a specific stream,
 					// we will get this config keyed by its regex stream,
@@ -145,7 +183,8 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 						'schema_title' => 'mediawiki/job',
 						'sample_rate' => 0.8,
 						'EventServiceName' => 'eventgate-main',
-						'topics' => [ '/^mediawiki\.job\..+/' ],
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ],
 					],
 				],
 				'get all streams with all settings'
@@ -171,8 +210,8 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 						'schema_title' => 'test/event',
 						'sample_rate' => 1.0,
 						'EventServiceName' => 'eventgate-main',
-						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
-						'topics' => [ 'eqiad.test.event', 'codfw.test.event' ],
+						'topic_prefixes' => [ 'dc1.', 'dc2.' ],
+						'topics' => [ 'dc1.test.event', 'dc2.test.event' ],
 					],
 					// Since we aren't asking for any specific streams,
 					// we will get this config keyed by its regex stream,
@@ -182,7 +221,8 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 						'schema_title' => 'mediawiki/job',
 						'sample_rate' => 0.8,
 						'EventServiceName' => 'eventgate-main',
-						'topics' => [ '/^mediawiki\.job\..+/' ],
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ],
 					]
 				],
 				'get all streams that have matching constraints'
@@ -200,7 +240,11 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 						'schema_title' => 'mediawiki/job',
 						'sample_rate' => 0.8,
 						'EventServiceName' => 'eventgate-main',
-						'topics' => [ 'mediawiki.job.workworkwork' ],
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [
+							'eqiad.mediawiki.job.workworkwork',
+							'codfw.mediawiki.job.workworkwork'
+						],
 					]
 				],
 				'get all streams that have matching stream names and constraints'
@@ -216,14 +260,19 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 						'schema_title' => 'mediawiki/nonya',
 						'sample_rate' => 0.5,
 						'EventServiceName' => 'eventgate-analytics',
-						'topics' => [ 'nonya' ],
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [ 'nonya_topic' ],
 					],
 					'mediawiki.job.workworkwork' => [
 						'stream' => '/^mediawiki\.job\..+/',
 						'schema_title' => 'mediawiki/job',
 						'sample_rate' => 0.8,
 						'EventServiceName' => 'eventgate-main',
-						'topics' => [ 'mediawiki.job.workworkwork' ],
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [
+							'eqiad.mediawiki.job.workworkwork',
+							'codfw.mediawiki.job.workworkwork'
+						],
 					]
 				],
 				'get by regex streams with all settings with topic prefixes'
@@ -234,7 +283,13 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 	/**
 	 * @dataProvider streamConfigsGetProvider
 	 */
-	public function testGet( $targetStreams, $allSettings, $constraints, $expected, $message ) {
+	public function testGet(
+		$targetStreams,
+		$allSettings,
+		$constraints,
+		$expected,
+		$message
+	) {
 		$result = $this->streamConfigs->get( $targetStreams, $allSettings, $constraints );
 		$this->assertEquals( $expected, $result, $message );
 	}
