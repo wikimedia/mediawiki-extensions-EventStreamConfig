@@ -9,5 +9,5 @@
 	"apihelp-streamconfigs-param-streams": "Liste over strømmer konfigurasjon skal hentes for",
 	"apihelp-streamconfigs-param-all_settings": "Inkluder alle innstillinger i strømkonfgurasjonsresultater",
 	"apihelp-streamconfigs-example-1": "Hent strømkonfigurasjoner for en liste over strømmer",
-	"apihelp-streamconfigs-example-2": "Hent strømkonfigurasjon for en strøm med alle innstillinger"
+	"apihelp-streamconfigs-example-2": "Hent strømkonfigurasjon for strømmer med alle innstillinger"
 }
