@@ -9,7 +9,7 @@ use Wikimedia\Assert\Assert;
 /**
  * Functions to aid in exporting event stream configs.  These configs should be set
  * in Global MW config to allow for more dynamic configuration of event stream settings
- * e.g. sample rates or EventServiceName.
+ * e.g. sample rates or destination_event_service.
  *
  * Some terms:
  * - StreamConfigs    - List of individual Stream Configs
@@ -26,7 +26,7 @@ use Wikimedia\Assert\Assert;
  *      "stream" => "my.event.stream-name",
  *      "schema_title" => "my/event/schema",
  *      "sample_rate" => 0.8,
- *      "EventServiceName" => "eventgate-analytics-public",
+ *      "destination_event_service" => "eventgate-analytics-public",
  *      ...
  * ]
  *

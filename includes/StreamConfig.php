@@ -30,7 +30,7 @@ class StreamConfig {
 	private const TOPICS_SETTING = 'topics';
 
 	/**
-	 * Blacklist of setting names that don't usually need to be included
+	 * Excludelist of setting names that don't usually need to be included
 	 * in config request results.  Not shipping irrelevant settings to
 	 * client side saves on bytes transferred.
 	 * @var array
@@ -39,9 +39,7 @@ class StreamConfig {
 		self::STREAM_SETTING,
 		self::TOPIC_PREFIXES_SETTING,
 		self::TOPICS_SETTING,
-		// Being deprecated in favor of destination_event_service_name
-		'EventServiceName',
-		'destination_event_service_name',
+		'destination_event_service',
 		'schema_title'
 	];
 
@@ -70,7 +68,7 @@ class StreamConfig {
 	 *          "stream" => "my.event.stream-name",
 	 *          "schema_title" => "my/event/schema",
 	 *          "sample_rate" => 0.8,
-	 *               "EventServiceName" => "eventgate-analytics-public",
+	 *          "destination_event_service" => "eventgate-analytics-public",
 	 *           ...
 	 *        ]
 	 * @param array $defaultSettings
