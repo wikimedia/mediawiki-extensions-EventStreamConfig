@@ -13,7 +13,7 @@ class StreamConfig {
 	 * Key of stream setting. Used to DRY references here.
 	 * @var string
 	 */
-	private const STREAM_SETTING = 'stream';
+	public const STREAM_SETTING = 'stream';
 
 	/**
 	 * Streams can be made up of multiple topics.  If
@@ -21,13 +21,13 @@ class StreamConfig {
 	 * the stream name with these prefixes.
 	 * @var array
 	 */
-	private const TOPIC_PREFIXES_SETTING = 'topic_prefixes';
+	public const TOPIC_PREFIXES_SETTING = 'topic_prefixes';
 
 	/**
 	 * Streams can be made up of multiple topics.
 	 * @var array
 	 */
-	private const TOPICS_SETTING = 'topics';
+	public const TOPICS_SETTING = 'topics';
 
 	/**
 	 * Excludelist of setting names that don't usually need to be included
