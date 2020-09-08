@@ -33,6 +33,8 @@ class StreamConfig {
 	 * Excludelist of setting names that don't usually need to be included
 	 * in config request results.  Not shipping irrelevant settings to
 	 * client side saves on bytes transferred.
+	 * TODO: This should probably be moved to a config as well, so
+	 * we can more easily customize the settings that are 'internal'.
 	 * @var array
 	 */
 	private const INTERNAL_SETTINGS = [
@@ -40,7 +42,8 @@ class StreamConfig {
 		self::TOPIC_PREFIXES_SETTING,
 		self::TOPICS_SETTING,
 		'destination_event_service',
-		'schema_title'
+		'schema_title',
+		'canary_events_enabled'
 	];
 
 	/**
