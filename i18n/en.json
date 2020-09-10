@@ -5,7 +5,7 @@
 		]
 	},
 	"eventstreamconfig-desc": "Exposes event stream config in an API endpoint. Can also be used to expose configs via ResourceLoader",
-	"apihelp-streamconfigs-summary": "Exposes event stream config. Returns only format=json with formatversion=2.",
+	"apihelp-streamconfigs-summary": "Exposes event stream config",
 	"apihelp-streamconfigs-param-streams": "List of streams to get config for",
 	"apihelp-streamconfigs-param-all_settings": "Include all settings in stream config results",
 	"apihelp-streamconfigs-param-constraints": "Filter results for stream config entries that have these settings",
