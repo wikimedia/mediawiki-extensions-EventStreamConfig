@@ -197,6 +197,72 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	/**
 	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
 	 */
+	public function testMatchesSettingsBoolean() {
+		$settings = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'sample_rate' => 0.5,
+			'destination_event_service' => 'eventgate-analytics',
+			'canary_events_enabled' => true,
+		];
+
+		$constraints = [
+			'canary_events_enabled' => true,
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
+	}
+
+	/**
+	 * PHP's array_intersect_assoc casts true to "1" before comparing.
+	 * So, if we want to compare with a string constraint value to a boolean setting,
+	 * we must pre-cast the constraint value to "1".
+	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
+	 */
+	public function testMatchesSettingsBooleanStringTrue() {
+		$settings = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'sample_rate' => 0.5,
+			'destination_event_service' => 'eventgate-analytics',
+			'canary_events_enabled' => true,
+		];
+
+		$constraints = [
+			'canary_events_enabled' => "1",
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
+	}
+
+	/**
+	 * PHP's array_intersect_assoc casts false to "" before comparing.
+	 * So, if we want to compare with a string constraint value to a boolean setting,
+	 * we must pre-cast the constraint value to "".
+	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
+	 */
+	public function testMatchesSettingsBooleanStringFalse() {
+		$settings = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'sample_rate' => 0.5,
+			'destination_event_service' => 'eventgate-analytics',
+			'canary_events_enabled' => false,
+		];
+
+		$constraints = [
+			'canary_events_enabled' => "",
+		];
+
+		$streamConfig = new StreamConfig( $settings );
+		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
+	 */
 	public function testNotMatchesSettings() {
 		$settings = [
 			'stream' => 'nonya',

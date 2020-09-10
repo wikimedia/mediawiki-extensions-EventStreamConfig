@@ -25,6 +25,7 @@ $wgEventStreams = [
         'sampling' => [
             'rate' => 0.15,
         ],
+        'canary_events_enabed' => true,
     ],
     [
         'stream' => 'nonya',
@@ -98,3 +99,31 @@ returns
     }
 }
 ```
+
+
+### Notes on settings constraints
+
+When requesting stream configs via either the PHP or the HTTP API, you may provide an assoc array
+of settings constraints with which to filter the stream configs.   E.g., if you want to only
+return streams that all have `schema_title` == 'mediawiki/edit', you can provide this as a constraint.
+
+EventStreamConfig uses PHP's `array_intersect_assoc` to match these constraints.  When using the HTTP
+API, it isn't possible to know the proper type of an incoming constraint value, so they are all
+provided as strings.  This is generally, good, as `array_intersec_assoc` compares values only
+after casting them to strings (!).  Be careful with boolean setting values though, as PHP is
+weird:
+
+```php
+>>> (string)true
+=> "1"
+>>> (string)"true"
+=> "true"
+>>> (string)false
+=> ""
+>>> (string)"false"
+=> "false"
+```
+
+So, when providing boolean constraints via the HTTP API, you should use the pre-casted string values
+that PHP casts booleans to.  E.g. intead of true, use "1", and instead of false, use "".
+
