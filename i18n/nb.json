@@ -5,7 +5,7 @@
 		]
 	},
 	"eventstreamconfig-desc": "Viser konfigurasjonen for hendelsesstrømmer i et API-endepunkt. Kan også brukes for å vise konfigurasjoner via ResourceLoader",
-	"apihelp-streamconfigs-summary": "Viser konfigurasjon for hendelsesstrøm",
+	"apihelp-streamconfigs-summary": "Viser konfigurasjon for hendelsesstrøm. Returnerer kun format=json med formatversion=2.",
 	"apihelp-streamconfigs-param-streams": "Liste over strømmer konfigurasjon skal hentes for",
 	"apihelp-streamconfigs-param-all_settings": "Inkluder alle innstillinger i strømkonfgurasjonsresultater",
 	"apihelp-streamconfigs-param-constraints": "Filtrer resultater for strømmingskonfigurasjonsoppføringer som har disse innstillingene.",
