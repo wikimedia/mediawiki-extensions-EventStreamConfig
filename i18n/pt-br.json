@@ -5,7 +5,7 @@
 		]
 	},
 	"eventstreamconfig-desc": "Expõe a configuração do fluxo de eventos em um terminal da API. Também pode ser usado para expor configurações via ResourceLoader",
-	"apihelp-streamconfigs-summary": "Expõe a configuração do fluxo de eventos",
+	"apihelp-streamconfigs-summary": "Expõe a configuração do fluxo de eventos. Retorna apenas format=json com formatversion=2.",
 	"apihelp-streamconfigs-param-streams": "Lista de fluxos para obter a configuração",
 	"apihelp-streamconfigs-param-all_settings": "Incluir todas as configurações nos resultados da configuração do fluxo",
 	"apihelp-streamconfigs-param-constraints": "Filtrar resultados para entradas de configuração de fluxo que possuem essas configurações",
