@@ -140,6 +140,13 @@ class ApiStreamConfigs extends ApiBase {
 	}
 
 	/**
+	 * @inheritDoc
+	 */
+	public function getCustomPrinter() {
+		return new ApiFormatJsonVersion2( $this->getMain(), 'json' );
+	}
+
+	/**
 	 * Parses a MULTI PARAM value into an assoc array.
 	 * Example:
 	 *   my_param=key1=val1|key2=val2
