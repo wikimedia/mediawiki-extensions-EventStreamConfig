@@ -129,7 +129,8 @@ class StreamConfigs {
 			}
 		} else {
 			$this->logger->debug(
-				'Selecting stream configs for target streams', $targetStreams
+				'Selecting stream configs for target streams: {streams}',
+				[ 'streams' => implode( " ", $targetStreams ) ]
 			);
 
 			foreach ( $targetStreams as $stream ) {
