@@ -4,7 +4,7 @@
 	"description": "Exposes event stream config in an API endpoint. Can also be used to expose configs via ResourceLoader",
 	"license": "GPL-2.0-or-later",
 	"require-dev": {
-		"mediawiki/mediawiki-codesniffer": "32.0.0",
+		"mediawiki/mediawiki-codesniffer": "33.0.0",
 		"mediawiki/mediawiki-phan-config": "0.10.3",
 		"mediawiki/minus-x": "1.1.0",
 		"php-parallel-lint/php-console-highlighter": "0.5.0",
