@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Eduardo Addad de Oliveira"
+			"Eduardo Addad de Oliveira",
+			"Eduardoaddad"
 		]
 	},
 	"eventstreamconfig-desc": "Expõe a configuração do fluxo de eventos em um terminal da API. Também pode ser usado para expor configurações via ResourceLoader",
