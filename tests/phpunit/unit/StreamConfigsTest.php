@@ -16,7 +16,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		[
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 			// explicit topics
 			'topics' => [ 'nonya_topic' ]
@@ -24,7 +26,10 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		[
 			'stream' => 'eventlogging_Test',
 			'schema_title' => 'analytics/legacy/test',
-			'sample_rate' => 1.0,
+			'sample' => [
+				'rate' => 1.0,
+				'unit' => 'session',
+			],
 			'destination_event_service' => 'eventgate-analytics',
 			// does not use topic prefixes, topic will be stream name
 			'topic_prefixes' => null,
@@ -32,7 +37,10 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		[
 			'stream' => 'test.event',
 			'schema_title' => 'test/event',
-			'sample_rate' => 1.0,
+			'sample' => [
+				'rate' => 1.0,
+				'unit' => 'session',
+			],
 			'destination_event_service' => 'eventgate-main',
 			// overridden topic prefixes, should not use defaults
 			'topic_prefixes' => [ 'dc1.', 'dc2.' ],
@@ -40,7 +48,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		[
 			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
-			'sample_rate' => 0.8,
+			'sample' => [
+				'rate' => 0.8,
+			],
 			'destination_event_service' => 'eventgate-main',
 		],
 	];
@@ -77,7 +87,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 				// expected
 				[
 					'nonya' => [
-						'sample_rate' => 0.5,
+						'sample' => [
+							'rate' => 0.5,
+						],
 					]
 				],
 				// test message
@@ -90,10 +102,15 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 				null,
 				[
 					'nonya' => [
-						'sample_rate' => 0.5,
+						'sample' => [
+							'rate' => 0.5,
+						],
 					],
 					'test.event' => [
-						'sample_rate' => 1.0,
+						'sample' => [
+							'rate' => 1.0,
+							'unit' => 'session',
+						],
 					]
 				],
 				'get by specific streams'
@@ -105,13 +122,19 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 				null,
 				[
 					'nonya' => [
-						'sample_rate' => 0.5,
+						'sample' => [
+							'rate' => 0.5,
+						],
 					],
 					'mediawiki.job.A' => [
-						'sample_rate' => 0.8,
+						'sample' => [
+							'rate' => 0.8,
+						],
 					],
 					'mediawiki.job.B' => [
-						'sample_rate' => 0.8,
+						'sample' => [
+							'rate' => 0.8,
+						],
 					]
 				],
 				'get by regex streams'
@@ -125,7 +148,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'nonya' => [
 						'stream' => 'nonya',
 						'schema_title' => 'mediawiki/nonya',
-						'sample_rate' => 0.5,
+						'sample' => [
+							'rate' => 0.5,
+						],
 						'destination_event_service' => 'eventgate-analytics',
 						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 						'topics' => [ 'nonya_topic' ],
@@ -133,7 +158,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'mediawiki.job.workworkwork' => [
 						'stream' => '/^mediawiki\.job\..+/',
 						'schema_title' => 'mediawiki/job',
-						'sample_rate' => 0.8,
+						'sample' => [
+							'rate' => 0.8,
+						],
 						'destination_event_service' => 'eventgate-main',
 						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 						'topics' => [
@@ -153,7 +180,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'nonya' => [
 						'stream' => 'nonya',
 						'schema_title' => 'mediawiki/nonya',
-						'sample_rate' => 0.5,
+						'sample' => [
+							'rate' => 0.5,
+						],
 						'destination_event_service' => 'eventgate-analytics',
 						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 						'topics' => [ 'nonya_topic' ],
@@ -161,7 +190,10 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'eventlogging_Test' => [
 						'stream' => 'eventlogging_Test',
 						'schema_title' => 'analytics/legacy/test',
-						'sample_rate' => 1.0,
+						'sample' => [
+							'rate' => 1.0,
+							'unit' => 'session',
+						],
 						'destination_event_service' => 'eventgate-analytics',
 						// does not use topic prefixes, topic will be stream name
 						'topic_prefixes' => null,
@@ -170,7 +202,10 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'test.event' => [
 						'stream' => 'test.event',
 						'schema_title' => 'test/event',
-						'sample_rate' => 1.0,
+						'sample' => [
+							'rate' => 1.0,
+							'unit' => 'session',
+						],
 						'destination_event_service' => 'eventgate-main',
 						'topic_prefixes' => [ 'dc1.', 'dc2.' ],
 						'topics' => [ 'dc1.test.event', 'dc2.test.event' ],
@@ -181,7 +216,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'/^mediawiki\.job\..+/' => [
 						'stream' => '/^mediawiki\.job\..+/',
 						'schema_title' => 'mediawiki/job',
-						'sample_rate' => 0.8,
+						'sample' => [
+							'rate' => 0.8,
+						],
 						'destination_event_service' => 'eventgate-main',
 						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 						'topics' => [ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ],
@@ -208,7 +245,10 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'test.event' => [
 						'stream' => 'test.event',
 						'schema_title' => 'test/event',
-						'sample_rate' => 1.0,
+						'sample' => [
+							'rate' => 1.0,
+							'unit' => 'session',
+						],
 						'destination_event_service' => 'eventgate-main',
 						'topic_prefixes' => [ 'dc1.', 'dc2.' ],
 						'topics' => [ 'dc1.test.event', 'dc2.test.event' ],
@@ -219,7 +259,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'/^mediawiki\.job\..+/' => [
 						'stream' => '/^mediawiki\.job\..+/',
 						'schema_title' => 'mediawiki/job',
-						'sample_rate' => 0.8,
+						'sample' => [
+							'rate' => 0.8,
+						],
 						'destination_event_service' => 'eventgate-main',
 						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 						'topics' => [ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ],
@@ -238,7 +280,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'mediawiki.job.workworkwork' => [
 						'stream' => '/^mediawiki\.job\..+/',
 						'schema_title' => 'mediawiki/job',
-						'sample_rate' => 0.8,
+						'sample' => [
+							'rate' => 0.8,
+						],
 						'destination_event_service' => 'eventgate-main',
 						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 						'topics' => [
@@ -258,7 +302,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'nonya' => [
 						'stream' => 'nonya',
 						'schema_title' => 'mediawiki/nonya',
-						'sample_rate' => 0.5,
+						'sample' => [
+							'rate' => 0.5,
+						],
 						'destination_event_service' => 'eventgate-analytics',
 						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 						'topics' => [ 'nonya_topic' ],
@@ -266,7 +312,9 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'mediawiki.job.workworkwork' => [
 						'stream' => '/^mediawiki\.job\..+/',
 						'schema_title' => 'mediawiki/job',
-						'sample_rate' => 0.8,
+						'sample' => [
+							'rate' => 0.8,
+						],
 						'destination_event_service' => 'eventgate-main',
 						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 						'topics' => [

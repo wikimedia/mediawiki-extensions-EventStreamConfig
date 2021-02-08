@@ -127,7 +127,7 @@ class ApiStreamConfigs extends ApiBase {
 
 			'action=streamconfigs&' . self::API_PARAM_STREAMS .
 			'=mediawiki.button-click&' . self::API_PARAM_ALL_SETTINGS .
-			'&constraints=event_service_name=eventgate-main|sample_rate=0.5' =>
+			'&constraints=event_service_name=eventgate-main' =>
 					'apihelp-streamconfigs-example-3',
 		];
 	}

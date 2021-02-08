@@ -14,7 +14,7 @@ use Wikimedia\Assert\Assert;
  * Some terms:
  * - StreamConfigs    - List of individual Stream Configs
  * - A StreamConfig   - an object of event stream settings
- * - A stream setting - an individual setting for an stream, e.g. 'sample_rate'.
+ * - A stream setting - an individual setting for an stream, e.g. 'schema_title'.
  *
  * See also:
  * - https://phabricator.wikimedia.org/T205319
@@ -25,7 +25,10 @@ use Wikimedia\Assert\Assert;
  * [
  *      "stream" => "my.event.stream-name",
  *      "schema_title" => "my/event/schema",
- *      "sample_rate" => 0.8,
+ *      "sample" => [
+ *          "rate" => 0.8,
+ *          "unit" => "session",
+ *      ],
  *      "destination_event_service" => "eventgate-analytics-public",
  *      ...
  * ]
