@@ -15,20 +15,29 @@ class StreamConfigsIntegrationTest extends MediaWikiIntegrationTestCase {
 		[
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+				'unit' => 'session',
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		],
 		[
 			'stream' => 'test.event',
 			'schema_title' => 'test/event',
-			'sample_rate' => 1.0,
+			'sample' => [
+				'rate' => 1.0,
+				'unit' => 'session',
+			],
 			'destination_event_service' => 'eventgate-main',
 			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 		],
 		[
 			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
-			'sample_rate' => 0.8,
+			'sample' => [
+				'rate' => 0.8,
+				'unit' => 'session',
+			],
 			'destination_event_service' => 'eventgate-main',
 		],
 	];
@@ -52,7 +61,10 @@ class StreamConfigsIntegrationTest extends MediaWikiIntegrationTestCase {
 
 		$expected = [
 			'nonya' => [
-				'sample_rate' => 0.5,
+				'sample' => [
+					'rate' => 0.5,
+					'unit' => 'session',
+				],
 			]
 		];
 		$result = $streamConfigs->get( [ 'nonya' ] );

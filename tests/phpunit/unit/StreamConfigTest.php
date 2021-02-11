@@ -18,7 +18,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
@@ -33,12 +35,16 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
 		$expected = [
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 		];
 
 		$streamConfig = new StreamConfig( $settings );
@@ -52,7 +58,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 			'topics' => [ 'nonya' ],
 		];
@@ -74,7 +82,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 		];
@@ -93,7 +103,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
@@ -108,7 +120,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
-			'sample_rate' => 0.8,
+			'sample' => [
+				'rate' => 0.8,
+			],
 			'destination_event_service' => 'eventgate-main',
 		];
 
@@ -123,7 +137,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
-			'sample_rate' => 0.8,
+			'sample' => [
+				'rate' => 0.8,
+			],
 			'destination_event_service' => 'eventgate-main',
 		];
 
@@ -140,7 +156,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	public function testMissingStreamName() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
 		$this->expectException( InvalidArgumentException::class );
@@ -154,7 +172,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 10.0,
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
 		$this->expectException( InvalidArgumentException::class );
@@ -168,7 +188,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => '/nonya/BADREGEX',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
 		$this->expectException( InvalidArgumentException::class );
@@ -182,7 +204,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
@@ -201,7 +225,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 			'canary_events_enabled' => true,
 		];
@@ -224,7 +250,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 			'canary_events_enabled' => true,
 		];
@@ -247,7 +275,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 			'canary_events_enabled' => false,
 		];
@@ -267,7 +297,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
@@ -302,7 +334,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 			'topics' => [ 'eqiad.nonya', 'codfw.nonya' ],
 		];
@@ -315,7 +349,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
@@ -327,7 +363,9 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$settings = [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
-			'sample_rate' => 0.5,
+			'sample' => [
+				'rate' => 0.5,
+			],
 			'destination_event_service' => 'eventgate-analytics',
 			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 		];

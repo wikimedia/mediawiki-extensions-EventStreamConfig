@@ -70,7 +70,10 @@ class StreamConfig {
 	 *        [
 	 *          "stream" => "my.event.stream-name",
 	 *          "schema_title" => "my/event/schema",
-	 *          "sample_rate" => 0.8,
+	 *          "sample" => [
+	 *            "rate" => 0.8,
+	 *            "unit" => "session",
+	 *          ],
 	 *          "destination_event_service" => "eventgate-analytics-public",
 	 *           ...
 	 *        ]

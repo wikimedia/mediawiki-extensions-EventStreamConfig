@@ -22,7 +22,7 @@ $wgEventStreams = [
     [
         'stream' => 'test.event',
         'schema_title' => 'test/event',
-        'sampling' => [
+        'sample' => [
             'rate' => 0.15,
         ],
         'canary_events_enabed' => true,
@@ -30,23 +30,24 @@ $wgEventStreams = [
     [
         'stream' => 'nonya',
         'schema_title' => 'mediawiki/nonya',
-        'sampling' => [
+        'sample' => [
             'rate' => 0.5,
         ],
     ],
     [
         'stream' => 'mediawiki.virtual_page_view',
         'schema_title' => 'mediawiki/page/virtual-view',
-        'sampling' => [
+        'sample' => [
             'rate' => 0.1,
-            'identifier' => 'pageview',
+            'unit' => 'pageview',
         ],
     ],
     [
         'stream' => '/^mediawiki.edit(\..+)?/',
         'schema_title' => 'mediawiki/edit',
-        'sampling' => [
+        'sample' => [
             'rate' => 0.8,
+            'unit' => 'session',
         ],
     ],
 ];
@@ -65,13 +66,14 @@ $streamConfigs->get( ['test.event', 'mediawiki.edit.cohort1'] );
 # returns
 [
     'test.event' => [
-        'sampling' => [
+        'sample' => [
             'rate' => 0.15,
         ],
     ],
     'mediawiki.edit.cohort1' => [
-        'sampling' => [
+        'sample' => [
             'rate' => 0.8,
+            'unit' => 'session',
         ],
     ]
 ]
@@ -88,13 +90,14 @@ returns
 ```json
 {
     "test.event": {
-        "sampling": {
-            "rate": 0.15
+        "sample": {
+            "rate": 0.15,
         }
     },
     "mediawiki.edit.cohort1": {
-        "sampling": {
-            "rate": 0.8
+        "sample": {
+            "rate": 0.8,
+            "unit": "session"
         }
     }
 }
