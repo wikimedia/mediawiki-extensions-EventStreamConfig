@@ -7,7 +7,7 @@ use ApiResult;
 use MediaWiki\MediaWikiServices;
 
 /**
- * Enables requesting whitelisted Mediawiki configs via the API.
+ * Enables requesting allowed MediaWiki configs via the API.
  * Usage:
  *
  * Get stream config settings
@@ -57,8 +57,8 @@ class ApiStreamConfigs extends ApiBase {
 
 	/**
 	 * By default, StreamConfigs#get will only return settings for streams
-	 * that are not blacklisted in StreamConfig::INTERNAL_SETTINGS.
-	 * Specifying the all_settings parameter will have it return
+	 * that are not disallowed in StreamConfig::INTERNAL_SETTINGS.
+	 * Specifying the all_settings parameter will have it return
 	 * all settings in the stream's config (like schema_title, etc.).
 	 */
 	private const API_PARAM_ALL_SETTINGS = 'all_settings';
