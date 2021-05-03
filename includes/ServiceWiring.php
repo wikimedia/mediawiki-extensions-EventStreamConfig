@@ -6,7 +6,7 @@ use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 
 return [
-	'EventStreamConfig.StreamConfigs' => function ( MediaWikiServices $services ) {
+	'EventStreamConfig.StreamConfigs' => static function ( MediaWikiServices $services ) {
 		$options = new ServiceOptions(
 			StreamConfigs::CONSTRUCTOR_OPTIONS, $services->getMainConfig()
 		);

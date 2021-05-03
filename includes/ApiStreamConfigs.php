@@ -168,7 +168,7 @@ class ApiStreamConfigs extends ApiBase {
 	) {
 		return array_reduce(
 			$multiParamArray,
-			function ( $carry, $elementString ) use ( $separator ) {
+			static function ( $carry, $elementString ) use ( $separator ) {
 				list( $key, $val ) = explode( $separator, $elementString );
 				$carry[$key] = $val;
 				return $carry;

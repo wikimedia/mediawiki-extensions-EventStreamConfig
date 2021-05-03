@@ -156,7 +156,7 @@ class StreamConfig {
 				// If $stream is a regex string, then we need to alter the
 				// regex to prefix safely inside the regex string.
 				return array_map(
-					function ( $topicPrefix ) use ( $stream ) {
+					static function ( $topicPrefix ) use ( $stream ) {
 						return $topicPrefix . $stream;
 					},
 					$topicPrefixes
