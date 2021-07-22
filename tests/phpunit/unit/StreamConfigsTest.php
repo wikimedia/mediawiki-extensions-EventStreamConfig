@@ -59,7 +59,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		'topic_prefixes' => [ 'eqiad.', 'codfw.' ]
 	];
 
-	public function setUp() : void {
+	public function setUp(): void {
 		parent::setUp();
 		$options = new ServiceOptions(
 			StreamConfigs::CONSTRUCTOR_OPTIONS,
