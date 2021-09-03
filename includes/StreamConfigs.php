@@ -20,21 +20,22 @@ use Wikimedia\Assert\Assert;
  * - https://phabricator.wikimedia.org/T205319
  * - https://phabricator.wikimedia.org/T233634
  *
- * This expects that 'EventStreams' is set in MW Config to an array
- * of stream configs..  Each stream config entry should look something like:
- * [
- *      "stream" => "my.event.stream-name",
+ * This expects that 'EventStreams' is set in MW Config to an associative array of stream
+ * configs keyed by stream name or regex pattern. Each stream config entry should look something
+ * like:
+ *
+ * "my.event.stream-name" => [
  *      "schema_title" => "my/event/schema",
  *      "sample" => [
  *          "rate" => 0.8,
  *          "unit" => "session",
  *      ],
- *      "destination_event_service" => "eventgate-analytics-public",
+ *      "destination_event_service" => "eventgate-analytics-external",
  *      ...
- * ]
+ * 	],
  *
- * `stream` may be a regex, in which case the functions here will match requested
- * target streams against the config stream name regex.
+ * If the stream is associated with a regex pattern, the functions here will match requested
+ * target streams against that pattern.
  */
 class StreamConfigs {
 	/**
@@ -47,10 +48,10 @@ class StreamConfigs {
 	];
 
 	/**
-	 * List of StreamConfig instances
+	 * Associative array of StreamConfigs keyed by stream name/pattern
 	 * @var array
 	 */
-	private $streamConfigEntries = [];
+	private $streamConfigs = [];
 
 	/**
 	 * @var \Psr\Log\LoggerInterface
@@ -67,14 +68,18 @@ class StreamConfigs {
 	public function __construct( ServiceOptions $options, LoggerInterface $logger ) {
 		$options->assertRequiredOptions( self::CONSTRUCTOR_OPTIONS );
 
-		$streamConfigsArray = $options->get( 'EventStreams' );
-		Assert::parameterType( 'array', $streamConfigsArray, 'EventStreams' );
+		$streamConfigs = $options->get( 'EventStreams' );
+		Assert::parameterType( 'array', $streamConfigs, 'EventStreams' );
 
 		$defaultSettings = $options->get( 'EventStreamsDefaultSettings' );
 		Assert::parameterType( 'array', $defaultSettings, 'EventStreamsDefaultSettings' );
 
-		foreach ( $streamConfigsArray as $streamConfig ) {
-			$this->streamConfigEntries[] = new StreamConfig( $streamConfig, $defaultSettings );
+		foreach ( $streamConfigs as $key => $config ) {
+			// Backwards compatibility for when stream configs used to be an integer indexed array.
+			$stream = is_int( $key ) && isset( $config[StreamConfig::STREAM_SETTING] ) ?
+				$config[StreamConfig::STREAM_SETTING] :
+				$key;
+			$this->streamConfigs[ $stream ] = new StreamConfig( $stream, $config, $defaultSettings );
 		}
 
 		$this->logger = $logger;
@@ -120,39 +125,31 @@ class StreamConfigs {
 	 * @return StreamConfig[]
 	 */
 	private function selectByStreams( array $targetStreams = null ): array {
-		$groupedStreamConfigs = [];
 		// If no $targetStreams were specified, then assume all are desired.
 		if ( $targetStreams === null ) {
-			// If no target stream names, just return the all stream config entries
-			// but keyed by stream name.
 			$this->logger->debug( 'Selecting all stream configs.' );
+			return $this->streamConfigs;
+		}
+		$groupedStreamConfigs = [];
+		$this->logger->debug(
+			'Selecting stream configs for target streams: {streams}',
+			[ 'streams' => implode( " ", $targetStreams ) ]
+		);
+		foreach ( $targetStreams as $stream ) {
+			// Find the config for this $stream.
+			// configured stream names can be exact streams or regexes.
+			// $stream will be matched against either.
+			$streamConfig = $this->findByStream( $stream );
 
-			foreach ( $this->streamConfigEntries as $streamConfigEntry ) {
-				$groupedStreamConfigs[$streamConfigEntry->stream()] = $streamConfigEntry;
-			}
-		} else {
-			$this->logger->debug(
-				'Selecting stream configs for target streams: {streams}',
-				[ 'streams' => implode( " ", $targetStreams ) ]
-			);
-
-			foreach ( $targetStreams as $stream ) {
-				// Find the config for this $stream.
-				// configured stream names can be exact streams or regexes.
-				// $stream will be matched against either.
-				$streamConfigEntry = $this->findByStream( $stream );
-
-				if ( $streamConfigEntry === null ) {
-					$this->logger->warning(
-						"Stream '$stream' does not match any `stream` in stream config"
-					);
-				} else {
-					// Else include the settings in the stream config result..
-					$groupedStreamConfigs[$stream] = $streamConfigEntry;
-				}
+			if ( $streamConfig === null ) {
+				$this->logger->warning(
+					"Stream '$stream' does not match any `stream` in stream config"
+				);
+			} else {
+				// Else include the settings in the stream config result..
+				$groupedStreamConfigs[$stream] = $streamConfig;
 			}
 		}
-
 		return $groupedStreamConfigs;
 	}
 
@@ -165,10 +162,16 @@ class StreamConfigs {
 	 * @return StreamConfig|null
 	 */
 	private function findByStream( $stream ) {
-		// Find the first 'stream' in $streamConfigs that matches $streamName.
-		foreach ( $this->streamConfigEntries as $streamConfig ) {
-			if ( $streamConfig->matches( $stream ) ) {
-				return $streamConfig;
+		// If a stream config is defined for the exact stream name provided, return it.
+		if ( isset( $this->streamConfigs[$stream] ) ) {
+			return $this->streamConfigs[$stream];
+		}
+
+		// If no exact match is found, iterate over $streamConfigs and return the config
+		// for the first pattern found that matches that matches the provided stream name.
+		foreach ( $this->streamConfigs as $config ) {
+			if ( $config->matches( $stream ) ) {
+				return $config;
 			}
 		}
 

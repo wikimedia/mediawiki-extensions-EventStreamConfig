@@ -13,6 +13,16 @@ use Psr\Log\NullLogger;
 class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 	private const STREAM_CONFIGS_FIXTURE = [
+		[
+			// Stream configs in MW config used to be integer indexed.
+			// This was changed to keyed by stream name in
+			// https://phabricator.wikimedia.org/T277193.
+			// Test that integer indexing still works, as long as
+			// 'stream' setting is provided.
+			'stream' => 'integer_indexed',
+			'schema_title' => 'integer_indexed_schema',
+			'destination_event_service' => 'eventgate-main',
+		],
 		'nonya' => [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
@@ -177,6 +187,13 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 				true,
 				null,
 				[
+					'integer_indexed' => [
+						'stream' => 'integer_indexed',
+						'schema_title' => 'integer_indexed_schema',
+						'destination_event_service' => 'eventgate-main',
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [ 'eqiad.integer_indexed', 'codfw.integer_indexed' ],
+					],
 					'nonya' => [
 						'stream' => 'nonya',
 						'schema_title' => 'mediawiki/nonya',
@@ -242,6 +259,13 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 					'destination_event_service' => 'eventgate-main',
 				],
 				[
+					'integer_indexed' => [
+						'stream' => 'integer_indexed',
+						'schema_title' => 'integer_indexed_schema',
+						'destination_event_service' => 'eventgate-main',
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [ 'eqiad.integer_indexed', 'codfw.integer_indexed' ],
+					],
 					'test.event' => [
 						'stream' => 'test.event',
 						'schema_title' => 'test/event',

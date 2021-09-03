@@ -61,6 +61,7 @@ class StreamConfig {
 	private $streamIsRegex;
 
 	/**
+	 * @param string $stream stream name, e.g., "my.event.stream-name"
 	 * @param array $settings
 	 *        An array with stream config settings.
 	 *        Must include a 'stream' setting with either the explicit stream
@@ -68,7 +69,6 @@ class StreamConfig {
 	 *        against stream names that this config should be used for.
 	 *        Example:
 	 *        [
-	 *          "stream" => "my.event.stream-name",
 	 *          "schema_title" => "my/event/schema",
 	 *          "sample" => [
 	 *            "rate" => 0.8,
@@ -80,8 +80,14 @@ class StreamConfig {
 	 * @param array $defaultSettings
 	 *        An array with default stream config settings.
 	 */
-	public function __construct( array $settings, array $defaultSettings = [] ) {
+	public function __construct( string $stream, array $settings, array $defaultSettings = [] ) {
 		$this->settings = $settings + $defaultSettings;
+
+		// To preserve backward compatibility, add the stream name or regex pattern to the config body
+		// as the 'stream' setting. This can likely be removed if we're sure nothing is relying on it.
+		// Background: T277193
+		$this->settings[self::STREAM_SETTING] = $stream;
+
 		self::validate( $this->settings );
 
 		$this->streamIsRegex = self::isValidRegex( $this->stream() );

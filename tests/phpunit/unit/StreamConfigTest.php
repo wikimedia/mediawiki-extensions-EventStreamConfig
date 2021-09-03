@@ -4,6 +4,7 @@ namespace MediaWiki\Extension\EventStreamConfig;
 
 use InvalidArgumentException;
 use MediaWikiUnitTestCase;
+use TypeError;
 
 /**
  * @covers \MediaWiki\Extension\EventStreamConfig\StreamConfig
@@ -16,7 +17,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testStream() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -24,7 +24,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertEquals( 'nonya', $streamConfig->stream() );
 	}
 
@@ -33,7 +33,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testToArray() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -47,7 +46,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			],
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertEquals( $expected, $streamConfig->toArray() );
 	}
 
@@ -56,7 +55,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testToArrayAllSettingsWithDefaults() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -65,13 +63,17 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'topics' => [ 'nonya' ],
 		];
 
+		$streamSetting = [
+			'stream' => 'nonya'
+		];
+
 		$defaultSettings = [
 			'is_active' => true
 		];
 
-		$expected = $settings + $defaultSettings;
+		$expected = $settings + $streamSetting + $defaultSettings;
 
-		$streamConfig = new StreamConfig( $settings, $defaultSettings );
+		$streamConfig = new StreamConfig( 'nonya', $settings, $defaultSettings );
 		$this->assertEquals( $expected, $streamConfig->toArray( true ) );
 	}
 
@@ -80,7 +82,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testToArrayWithTopicPrefixesAllSettings() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -89,10 +90,14 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 		];
 
-		$expected = $settings;
+		$streamSetting = [
+			'stream' => 'nonya'
+		];
+
+		$expected = $settings + $streamSetting;
 		$expected['topics'] = [ 'eqiad.nonya', 'codfw.nonya' ];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertEquals( $expected, $streamConfig->toArray( true ) );
 	}
 
@@ -101,7 +106,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testMatchesString() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -109,7 +113,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertTrue( $streamConfig->matches( 'nonya' ) );
 	}
 
@@ -118,7 +122,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testMatchesRegex() {
 		$settings = [
-			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'sample' => [
 				'rate' => 0.8,
@@ -126,7 +129,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'destination_event_service' => 'eventgate-main',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertTrue( (bool)$streamConfig->matches( 'mediawiki.job.workworkwork' ) );
 	}
 
@@ -135,7 +138,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testGivenRegexStreamDoesNotMatch() {
 		$settings = [
-			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'sample' => [
 				'rate' => 0.8,
@@ -143,7 +145,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'destination_event_service' => 'eventgate-main',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		// Since the stream setting should be recognized as a regex, string equivalence
 		// should not be used to match the incoming target stream name, and
 		// preg_match( $regex, $regex ) will be false.
@@ -161,24 +163,8 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			],
 			'destination_event_service' => 'eventgate-analytics',
 		];
-		$this->expectException( InvalidArgumentException::class );
-		new StreamConfig( $settings );
-	}
-
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::__construct()
-	 */
-	public function testWrongStreamNameType() {
-		$settings = [
-			'stream' => 10.0,
-			'schema_title' => 'mediawiki/nonya',
-			'sample' => [
-				'rate' => 0.5,
-			],
-			'destination_event_service' => 'eventgate-analytics',
-		];
-		$this->expectException( InvalidArgumentException::class );
-		new StreamConfig( $settings );
+		$this->expectException( TypeError::class );
+		new StreamConfig( null, $settings );
 	}
 
 	/**
@@ -186,7 +172,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testInvalidStreamNameRegex() {
 		$settings = [
-			'stream' => '/nonya/BADREGEX',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -194,7 +179,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'destination_event_service' => 'eventgate-analytics',
 		];
 		$this->expectException( InvalidArgumentException::class );
-		new StreamConfig( $settings );
+		new StreamConfig( '/nonya/BADREGEX', $settings );
 	}
 
 	/**
@@ -202,7 +187,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testMatchesSettings() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -214,7 +198,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
 	}
 
@@ -223,7 +207,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testMatchesSettingsBoolean() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -236,7 +219,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'canary_events_enabled' => true,
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
 	}
 
@@ -248,7 +231,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testMatchesSettingsBooleanStringTrue() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -261,7 +243,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'canary_events_enabled' => "1",
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
 	}
 
@@ -273,7 +255,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testMatchesSettingsBooleanStringFalse() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -286,7 +267,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'canary_events_enabled' => "",
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
 	}
 
@@ -295,7 +276,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testNotMatchesSettings() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -307,7 +287,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'destination_event_service' => 'eventgate-main',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertFalse( $streamConfig->matchesSettings( $constraints ) );
 	}
 
@@ -316,7 +296,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 */
 	public function testMatchesSettingsStreamRegex() {
 		$settings = [
-			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'destination_event_service' => 'eventgate-main',
 		];
@@ -326,13 +305,12 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'destination_event_service' => 'eventgate-main',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
 	}
 
 	public function testTopicsWithExplicitTopicsSetting() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -341,13 +319,12 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'topics' => [ 'eqiad.nonya', 'codfw.nonya' ],
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertEquals( $streamConfig->topics(), $settings['topics'] );
 	}
 
 	public function testTopicsWithoutTopicPrefixes() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -355,13 +332,12 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'destination_event_service' => 'eventgate-analytics',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertEquals( $streamConfig->topics(), [ 'nonya' ] );
 	}
 
 	public function testTopicsWithTopicPrefixes() {
 		$settings = [
-			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
@@ -370,41 +346,38 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertEquals( $streamConfig->topics(), [ 'eqiad.nonya', 'codfw.nonya' ] );
 	}
 
 	public function testTopicsStreamRegexSettingWithoutTopicPrefixes() {
 		$settings = [
-			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'destination_event_service' => 'eventgate-main',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
-		$this->assertEquals( $streamConfig->topics(), [ $settings['stream'] ] );
+		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
+		$this->assertEquals( $streamConfig->topics(), [ '/^mediawiki\.job\..+/' ] );
 	}
 
 	public function testTopicsStreamRegexSettingWithTopicPrefixes() {
 		$settings = [
-			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'destination_event_service' => 'eventgate-main',
 			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertEquals( $streamConfig->topics(), [ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ] );
 	}
 
 	public function testTopicsTargetStreamNameWithoutTopicPrefixes() {
 		$settings = [
-			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'destination_event_service' => 'eventgate-main',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertEquals(
 			$streamConfig->topics( 'mediawiki.job.workworkwork' ),
 			[ 'mediawiki.job.workworkwork' ]
@@ -413,13 +386,12 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 	public function testTopicsTargetStreamNameWithTopicPrefixes() {
 		$settings = [
-			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'destination_event_service' => 'eventgate-main',
 			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertEquals(
 			$streamConfig->topics( 'mediawiki.job.workworkwork' ),
 			[ 'eqiad.mediawiki.job.workworkwork', 'codfw.mediawiki.job.workworkwork' ]
@@ -428,12 +400,11 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 	public function testTopicsTargetStreamRegexWithoutTopicPrefixes() {
 		$settings = [
-			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'destination_event_service' => 'eventgate-main',
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertEquals(
 			$streamConfig->topics( '/^mediawiki\.job\..+/' ),
 			[ '/^mediawiki\.job\..+/' ]
@@ -442,13 +413,12 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 	public function testTopicsTargetStreamRegexWithTopicPrefixes() {
 		$settings = [
-			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'destination_event_service' => 'eventgate-main',
 			'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
 		];
 
-		$streamConfig = new StreamConfig( $settings );
+		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertEquals(
 			$streamConfig->topics( '/^mediawiki\.job\..+/' ),
 			[ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ]

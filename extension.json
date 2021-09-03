@@ -26,8 +26,8 @@
 	],
 	"config": {
 		"EventStreams": {
-			"value": [],
-			"description": "A list of individual stream configs. Each stream config object must minimally specify its `schema_title` and its `stream` name settings. The `stream` may either be a static stream name string, or a regex that matches stream names for which the stream config should be used."
+			"value": {},
+			"description": "An associative array of stream configs keyed by a either static stream name string, or a regex that matches stream names for which the stream config should be used. Each stream config value must minimally specify its `schema_title` setting."
 		},
 		"EventStreamsDefaultSettings": {
 			"value": {},
