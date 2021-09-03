@@ -13,7 +13,7 @@ use Psr\Log\NullLogger;
 class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 	private const STREAM_CONFIGS_FIXTURE = [
-		[
+		'nonya' => [
 			'stream' => 'nonya',
 			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
@@ -23,7 +23,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			// explicit topics
 			'topics' => [ 'nonya_topic' ]
 		],
-		[
+		'eventlogging_Test' => [
 			'stream' => 'eventlogging_Test',
 			'schema_title' => 'analytics/legacy/test',
 			'sample' => [
@@ -34,7 +34,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			// does not use topic prefixes, topic will be stream name
 			'topic_prefixes' => null,
 		],
-		[
+		'test.event' => [
 			'stream' => 'test.event',
 			'schema_title' => 'test/event',
 			'sample' => [
@@ -45,7 +45,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			// overridden topic prefixes, should not use defaults
 			'topic_prefixes' => [ 'dc1.', 'dc2.' ],
 		],
-		[
+		'/^mediawiki\.job\..+/' => [
 			'stream' => '/^mediawiki\.job\..+/',
 			'schema_title' => 'mediawiki/job',
 			'sample' => [
