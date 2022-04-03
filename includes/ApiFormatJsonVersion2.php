@@ -1,8 +1,8 @@
 <?php
 namespace MediaWiki\Extension\EventStreamConfig;
 
-use ApiBase;
 use ApiFormatJson;
+use Wikimedia\ParamValidator\ParamValidator;
 
 /**
  * Overrides ApiFormatJson::getAllowedParams to disable formatversion=1
@@ -17,8 +17,8 @@ class ApiFormatJsonVersion2 extends ApiFormatJson {
 	 */
 	public function getAllowedParams() {
 		$allowedParams = parent::getAllowedParams();
-		$allowedParams['formatversion'][ApiBase::PARAM_TYPE] = [ '2', 'latest' ];
-		$allowedParams['formatversion'][ApiBase::PARAM_DFLT] = '2';
+		$allowedParams['formatversion'][ParamValidator::PARAM_TYPE] = [ '2', 'latest' ];
+		$allowedParams['formatversion'][ParamValidator::PARAM_DEFAULT] = '2';
 		return $allowedParams;
 	}
 }

@@ -5,6 +5,7 @@ namespace MediaWiki\Extension\EventStreamConfig;
 use ApiBase;
 use ApiResult;
 use MediaWiki\MediaWikiServices;
+use Wikimedia\ParamValidator\ParamValidator;
 
 /**
  * Enables requesting allowed MediaWiki configs via the API.
@@ -101,13 +102,13 @@ class ApiStreamConfigs extends ApiBase {
 	public function getAllowedParams() {
 		return [
 			self::API_PARAM_STREAMS => [
-				ApiBase::PARAM_ISMULTI => true,
+				ParamValidator::PARAM_ISMULTI => true,
 			],
 			self::API_PARAM_CONSTRAINTS => [
-				ApiBase::PARAM_ISMULTI => true,
+				ParamValidator::PARAM_ISMULTI => true,
 			],
 			self::API_PARAM_ALL_SETTINGS => [
-				ApiBase::PARAM_TYPE => 'boolean',
+				ParamValidator::PARAM_TYPE => 'boolean',
 			],
 		];
 	}
