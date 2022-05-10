@@ -26,6 +26,15 @@ class ApiStreamConfigsTest extends ApiTestCase {
 				'true-setting' => true,
 				'false-setting' => false,
 			],
+			'test2' => [
+				StreamConfig::STREAM_SETTING => 'test2',
+				'foo' => [
+					'bar' => 'baz',
+					'qux' => [
+						'qux',
+					],
+				],
+			],
 		] );
 	}
 
@@ -60,4 +69,24 @@ class ApiStreamConfigsTest extends ApiTestCase {
 		return $module->getResult()->getResultData();
 	}
 
+	public function testConstraints(): void {
+		$result = $this->doApiRequest( [
+			'action' => 'streamconfigs',
+			'constraints' => 'foo[bar]=baz',
+		] );
+		$streams = $result[0]['streams'];
+
+		$this->assertCount( 1, array_keys( $streams ) );
+		$this->assertArrayHasKey( 'test2', $streams );
+
+		// ---
+
+		$result = $this->doApiRequest( [
+			'action' => 'streamconfigs',
+			'constraints' => 'foo=true',
+		] );
+		$streams = $result[0]['streams'];
+
+		$this->assertCount( 0, $streams );
+	}
 }

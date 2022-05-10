@@ -149,30 +149,26 @@ class ApiStreamConfigs extends ApiBase {
 
 	/**
 	 * Parses a MULTI PARAM value into an assoc array.
-	 * Example:
-	 *   my_param=key1=val1|key2=val2
-	 * If $this->getParameter( 'my_param' ) is passed, this function will return
-	 * @code
-	 *   [
-	 *       'key1' => 'val1',
-	 *       'key2' => 'val2',
-	 *   ]
-	 * @endcode
+	 *
+	 * For example, the query string parameter "my_param=key1=val1|key2[key3]=val2" will be parsed into the following:
+	 *
+	 * ```
+	 * [
+	 *     'key1' => 'val1',
+	 *     'key2' => [
+	 *         'key3' => 'val2',
+	 *     ],
+	 * ]
+	 * ```
 	 *
 	 * @param array $multiParamArray List of key=val string pairs
-	 * @param string $separator Separator to use when splitting key,value pairs.  Default: =
 	 * @return array
 	 */
-	private static function multiParamToAssocArray(
-		array $multiParamArray,
-		string $separator = '='
-	) {
+	private static function multiParamToAssocArray( array $multiParamArray ) {
 		return array_reduce(
 			$multiParamArray,
-			static function ( $carry, $elementString ) use ( $separator ) {
-				list( $key, $val ) = explode( $separator, $elementString );
-				$carry[$key] = $val;
-				return $carry;
+			static function ( $carry, $elementString ) {
+				return array_merge_recursive( $carry, wfCgiToArray( $elementString ) );
 			},
 			[]
 		);

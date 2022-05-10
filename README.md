@@ -103,6 +103,22 @@ returns
 }
 ```
 
+```
+curl http://wiki.domain.org/w/api.php?action=streamconfigs&format=json&constraints=sample[rate]=0.15
+```
+
+returns
+
+```json
+{
+    "test.event": {
+        "sample": {
+            "rate": 0.15
+        }
+    }
+}
+```
+
 
 ### Notes on settings constraints
 
