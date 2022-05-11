@@ -2,7 +2,7 @@
 
 This extension provides library functions and an API endpoint for exporting event stream configuration from the `$wgEventStreams` MediaWiki configuration variable.
 
-This allows for centralized configuration of streams for both Mediawiki and external uses.
+This allows for centralized configuration of streams for both Mediawiki and external uses.
 
 - The [EventLogging extension](T223931) uses this with [ResourceLoader](https://www.mediawiki.org/wiki/ResourceLoader) to load configs for streams used on certain pages to dynamically configure client stream settings, like sampling rate.
 - Mobile apps use the API endpoint to dynamically configure client stream settings like sample rate.
@@ -91,7 +91,7 @@ returns
 {
     "test.event": {
         "sample": {
-            "rate": 0.15,
+            "rate": 0.15
         }
     },
     "mediawiki.edit.cohort1": {
@@ -168,6 +168,6 @@ though, as PHP is weird:
 => "false"
 ```
 
-So, when providing boolean constraints via the HTTP API, you should use the pre-casted string values
-that PHP casts booleans to.  E.g. intead of true, use "1", and instead of false, use "".
+So, when providing boolean constraints via the HTTP API, you should use the pre-casted string values
+that PHP casts booleans to.  E.g. instead of `true`, use `"1"`, and instead of `false`, use `""`.
 
