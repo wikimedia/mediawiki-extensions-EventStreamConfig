@@ -42,17 +42,17 @@ class StreamConfigsIntegrationTest extends MediaWikiIntegrationTestCase {
 		],
 	];
 
-	private const STREAM_CONFIG_DEFAULT_SETTINGS_FIXTURE = [
-		'topic_prefixes' => [ 'eqiad.', 'codfw.' ]
-	];
-
 	/**
 	 * @covers \MediaWiki\Extension\EventStreamConfig\StreamConfigs::__construct()
 	 */
 	public function testMediaWikiServiceIntegration() {
 		$this->setMwGlobals( [
 			'wgEventStreams' => self::STREAM_CONFIGS_FIXTURE,
-			'wgEventStreamsDefaultSettings' => self::STREAM_CONFIG_DEFAULT_SETTINGS_FIXTURE,
+			'wgEventStreamsDefaultSettings' => [
+				'topic_prefixes' => [
+					'eqiad.'
+				],
+			],
 		] );
 
 		$streamConfigs = MediaWikiServices::getInstance()->getService(
@@ -61,11 +61,20 @@ class StreamConfigsIntegrationTest extends MediaWikiIntegrationTestCase {
 
 		$expected = [
 			'nonya' => [
+				'stream' => 'nonya',
+				'schema_title' => 'mediawiki/nonya',
 				'sample' => [
 					'rate' => 0.5,
 					'unit' => 'session',
 				],
-			]
+				'destination_event_service' => 'eventgate-analytics',
+				'topic_prefixes' => [
+					'eqiad.',
+				],
+				'topics' => [
+					'eqiad.nonya',
+				],
+			],
 		];
 		$result = $streamConfigs->get( [ 'nonya' ] );
 		$this->assertEquals( $expected, $result );

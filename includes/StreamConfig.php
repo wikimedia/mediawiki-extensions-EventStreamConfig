@@ -30,23 +30,6 @@ class StreamConfig {
 	public const TOPICS_SETTING = 'topics';
 
 	/**
-	 * Excludelist of setting names that don't usually need to be included
-	 * in config request results.  Not shipping irrelevant settings to
-	 * client side saves on bytes transferred.
-	 * TODO: This should probably be moved to a config as well, so
-	 * we can more easily customize the settings that are 'internal'.
-	 * @var array
-	 */
-	private const INTERNAL_SETTINGS = [
-		self::STREAM_SETTING,
-		self::TOPIC_PREFIXES_SETTING,
-		self::TOPICS_SETTING,
-		'destination_event_service',
-		'schema_title',
-		'canary_events_enabled'
-	];
-
-	/**
 	 * Wrapped array with stream config settings.  See $settings
 	 * param doc for __construct().
 	 * @var array
@@ -176,26 +159,18 @@ class StreamConfig {
 	 * self::TOPICS_SETTING is set to the value returned by $this->topics($targetStream)
 	 * if self::TOPICS_SETTING is not explicitly set.
 	 *
-	 * @param bool $includeAllSettings
-	 *        If false, the settings in INTERNAL_SETTINGS
-	 *        will be excluded.  Default: false.
-	 *
 	 * @param string|null $targetStream
 	 *        If given, this will be used to get topics, otherwise $this->stream()
 	 *        will be used (which could be a regex stream pattern).
 	 *
 	 * @return array
 	 */
-	public function toArray( $includeAllSettings = false, $targetStream = null ): array {
+	public function toArray( $targetStream = null ): array {
 		$settings = $this->settings;
 
 		// If TOPICS_SETTING is already set explicitly in the settings,
 		// $this->topics() will just return it.
 		$settings[self::TOPICS_SETTING] = $this->topics( $targetStream );
-
-		if ( !$includeAllSettings ) {
-			$settings = array_diff_key( $settings, array_flip( self::INTERNAL_SETTINGS ) );
-		}
 
 		return $settings;
 	}

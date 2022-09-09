@@ -90,8 +90,6 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 			[
 				// targetStreams
 				[ 'nonya' ],
-				// allSettings
-				false,
 				// constrains
 				null,
 				// expected
@@ -100,7 +98,12 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 						'sample' => [
 							'rate' => 0.5,
 						],
-					]
+						'stream' => 'nonya',
+						'schema_title' => 'mediawiki/nonya',
+						'destination_event_service' => 'eventgate-analytics',
+						'topics' => [ 'nonya_topic' ],
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+					],
 				],
 				// test message
 				'get by specific stream'
@@ -108,18 +111,30 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 			[
 				[ 'nonya', 'test.event' ],
-				false,
 				null,
 				[
 					'nonya' => [
 						'sample' => [
 							'rate' => 0.5,
 						],
+						'stream' => 'nonya',
+						'schema_title' => 'mediawiki/nonya',
+						'destination_event_service' => 'eventgate-analytics',
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [ 'nonya_topic' ],
 					],
 					'test.event' => [
 						'sample' => [
 							'rate' => 1.0,
 							'unit' => 'session',
+						],
+						'stream' => 'test.event',
+						'schema_title' => 'test/event',
+						'destination_event_service' => 'eventgate-main',
+						'topic_prefixes' => [ 'dc1.', 'dc2.' ],
+						'topics' => [
+							'dc1.test.event',
+							'dc2.test.event',
 						],
 					]
 				],
@@ -128,31 +143,50 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 			[
 				[ 'nonya', 'mediawiki.job.A', 'mediawiki.job.B' ],
-				false,
 				null,
 				[
 					'nonya' => [
 						'sample' => [
 							'rate' => 0.5,
 						],
+						'stream' => 'nonya',
+						'schema_title' => 'mediawiki/nonya',
+						'destination_event_service' => 'eventgate-analytics',
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [ 'nonya_topic' ],
 					],
 					'mediawiki.job.A' => [
+						'stream' => '/^mediawiki\.job\..+/',
+						'schema_title' => 'mediawiki/job',
 						'sample' => [
 							'rate' => 0.8,
+						],
+						'destination_event_service' => 'eventgate-main',
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [
+							'eqiad.mediawiki.job.A',
+							'codfw.mediawiki.job.A',
 						],
 					],
 					'mediawiki.job.B' => [
+						'stream' => '/^mediawiki\.job\..+/',
+						'schema_title' => 'mediawiki/job',
 						'sample' => [
 							'rate' => 0.8,
 						],
-					]
+						'destination_event_service' => 'eventgate-main',
+						'topic_prefixes' => [ 'eqiad.', 'codfw.' ],
+						'topics' => [
+							'eqiad.mediawiki.job.B',
+							'codfw.mediawiki.job.B',
+						],
+					],
 				],
 				'get by regex streams'
 			],
 
 			[
 				[ 'nonya', 'mediawiki.job.workworkwork' ],
-				true,
 				null,
 				[
 					'nonya' => [
@@ -184,7 +218,6 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 			[
 				null,
-				true,
 				null,
 				[
 					'integer_indexed' => [
@@ -246,7 +279,6 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 			[
 				[ 'unconfigured-stream-name' ],
-				false,
 				null,
 				[],
 				'get an unconfigured stream name'
@@ -254,7 +286,6 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 			[
 				null,
-				true,
 				[
 					'destination_event_service' => 'eventgate-main',
 				],
@@ -296,7 +327,6 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 			[
 				[ 'mediawiki.job.workworkwork' ],
-				true,
 				[
 					'destination_event_service' => 'eventgate-main',
 				],
@@ -320,7 +350,6 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 			[
 				[ 'nonya', 'mediawiki.job.workworkwork' ],
-				true,
 				null,
 				[
 					'nonya' => [
@@ -357,12 +386,11 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 	 */
 	public function testGet(
 		$targetStreams,
-		$allSettings,
 		$constraints,
 		$expected,
 		$message
 	) {
-		$result = $this->streamConfigs->get( $targetStreams, $allSettings, $constraints );
+		$result = $this->streamConfigs->get( $targetStreams, true, $constraints );
 		$this->assertEquals( $expected, $result, $message );
 	}
 

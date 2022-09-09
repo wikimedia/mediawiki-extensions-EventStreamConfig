@@ -42,9 +42,13 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		];
 
 		$expected = [
+			'schema_title' => 'mediawiki/nonya',
 			'sample' => [
 				'rate' => 0.5,
 			],
+			'destination_event_service' => 'eventgate-analytics',
+			'stream' => 'nonya',
+			'topics' => [ 'nonya' ],
 		];
 
 		$streamConfig = new StreamConfig( 'nonya', $settings );
@@ -75,7 +79,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$expected = $settings + $streamSetting + $defaultSettings;
 
 		$streamConfig = new StreamConfig( 'nonya', $settings, $defaultSettings );
-		$this->assertEquals( $expected, $streamConfig->toArray( true ) );
+		$this->assertEquals( $expected, $streamConfig->toArray() );
 	}
 
 	/**
@@ -99,7 +103,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$expected['topics'] = [ 'eqiad.nonya', 'codfw.nonya' ];
 
 		$streamConfig = new StreamConfig( 'nonya', $settings );
-		$this->assertEquals( $expected, $streamConfig->toArray( true ) );
+		$this->assertEquals( $expected, $streamConfig->toArray() );
 	}
 
 	/**

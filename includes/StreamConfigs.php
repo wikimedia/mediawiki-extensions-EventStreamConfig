@@ -91,8 +91,8 @@ class StreamConfigs {
 	 * @param array|null $targetStreams
 	 *     List of stream names. If not provided, all stream configs will be returned.
 	 * @param bool $includeAllSettings
-	 *     If $includeAllSettings is false, only setting keys that match those in
-	 *     StreamConfig::SETTINGS_FOR_EXPORT will be returned.
+	 *     Deprecated per https://phabricator.wikimedia.org/T286344. All settings will be returned
+	 *     regardless of the value of this parameter.
 	 * @param array|null $settingsConstraints
 	 *     If given, returned stream config entries will be filtered for those that
 	 *     have these settings.
@@ -110,7 +110,7 @@ class StreamConfigs {
 				!$settingsConstraints ||
 				$streamConfigEntry->matchesSettings( $settingsConstraints )
 			) {
-				$result[$stream] = $streamConfigEntry->toArray( $includeAllSettings, $stream );
+				$result[$stream] = $streamConfigEntry->toArray( $stream );
 			}
 		}
 		return $result;
