@@ -225,17 +225,77 @@ class StreamConfig {
 			if ( !$this->matches( $settingsConstraints[self::STREAM_SETTING] ) ) {
 				return false;
 			}
-			// stream matching is special and can't use array_intersec_assoc.
-			// Since we've already matched stream, remove it from the constraints now.
+			// stream matching is special and can't use ::isPartialMatch(). Since we've already
+			// matched stream, remove it from the constraints now.
 			unset( $settingsConstraints[self::STREAM_SETTING] );
 		}
 
-		// The intersection of this StreamConfig settings and the constraints
-		// should return exactly the constraints if this StreamConfig matches them.
-		return array_intersect_assoc(
-			$settingsConstraints,
-			$this->settings
-		) == $settingsConstraints;
+		return $this->isPartialMatch( $this->settings, $settingsConstraints );
+	}
+
+	/**
+	 * Partially matches two arrays, LHS and RHS, with one another up to a maximum depth. LHS and
+	 * RHS are considered a partial match if LHS contains all of RHS.
+	 *
+	 * To maintain backwards compatibility, all non-array values are cast to strings before they
+	 * are compared.
+	 *
+	 * @param array $lhs
+	 * @param array $rhs
+	 * @param int $maxDepth
+	 * @return bool
+	 */
+	private function isPartialMatch( $lhs, $rhs, $maxDepth = 10 ) {
+		if ( $maxDepth === 0 ) {
+			return true;
+		}
+
+		foreach ( $rhs as $key => $expected ) {
+			if ( !isset( $lhs[$key] ) ) {
+				return false;
+			}
+
+			$actual = $lhs[$key];
+
+			if ( is_array( $expected ) && is_array( $actual ) ) {
+				if ( $this->arrayIsList( $expected ) && $this->arrayIsList( $actual ) ) {
+					return array_intersect( $expected, $actual ) === $expected;
+				}
+
+				if ( !$this->isPartialMatch( $actual, $expected, $maxDepth - 1 ) ) {
+					return false;
+				}
+			} elseif (
+
+				// Avoid casting $expected or $actual to a string if either one of them is an
+				// array.
+				is_array( $expected ) ||
+				is_array( $actual ) ||
+
+				(string)$expected !== (string)$actual
+			) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Gets whether the array is a list, i.e. an integer-indexed array with indices starting at 0.
+	 *
+	 * As written, this method trades performance for elegance. This method should not be called on
+	 * large arrays.
+	 *
+	 * TODO: Replace this with array_is_list when MediaWiki supports PHP >= 8.1
+	 *
+	 * @param array $array
+	 * @return bool
+	 */
+	private function arrayIsList( $array ) {
+		$array = array_keys( $array );
+
+		return $array === array_keys( $array );
 	}
 
 	/**

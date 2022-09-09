@@ -2,6 +2,7 @@
 
 namespace MediaWiki\Extension\EventStreamConfig;
 
+use Generator;
 use InvalidArgumentException;
 use MediaWikiUnitTestCase;
 use TypeError;
@@ -289,6 +290,133 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 		$streamConfig = new StreamConfig( 'nonya', $settings );
 		$this->assertFalse( $streamConfig->matchesSettings( $constraints ) );
+	}
+
+	public function provideMatchesSettingsRecursive(): Generator {
+		yield [
+			'constraints' => [
+				'producers' => [
+					'bar_producer' => true,
+				],
+			],
+			'expected' => true,
+		];
+
+		yield [
+			'constraints' => [
+				'unrecognized' => true,
+			],
+			'expected' => false,
+		];
+
+		yield [
+			'constraints' => [
+				'producers' => [
+					'foo_producer' => [
+						'foo_setting' => false,
+					],
+					'bar_producer' => true,
+				],
+			],
+			'expected' => true,
+		];
+
+		// Like array_intersect_assoc, StreamConfig::isPartialMatch should cast the values to
+		// strings before comparing them.
+		//
+		// See also the note for ::testMatchesSettingsBooleanStringFalse.
+		yield [
+			'constraints' => [
+				'producers' => [
+					'foo_producer' => [
+						'foo_setting' => '',
+					],
+					'bar_producer' => '1',
+				],
+			],
+			'expected' => true,
+		];
+
+		yield [
+			'constraints' => [
+				'producers' => [
+					'baz_producer' => 0.1,
+				],
+			],
+			'expected' => true,
+		];
+
+		yield [
+			'constraints' => [
+				'producers' => [
+					'qux_producer' => [
+						'world',
+					],
+				],
+			],
+			'expected' => true,
+		];
+
+		yield [
+			'constraints' => [
+				'producers' => [
+					'qux_producer' => [
+						'hello',
+						'world',
+						'quux',
+					],
+				],
+			],
+			'expected' => false,
+		];
+
+		yield [
+			'constraints' => [
+				'producers' => [
+					'foo_producer' => [
+						'hello',
+						'world',
+					],
+				],
+			],
+			'expected' => false,
+		];
+
+		yield [
+			'constraints' => [
+				'foo_producer' => false,
+				'qux_producer' => 'Hello, World!',
+			],
+			'expected' => false,
+		];
+	}
+
+	/**
+	 * @dataProvider provideMatchesSettingsRecursive
+	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
+	 */
+	public function testMatchesSettingsRecursive( array $constraints, bool $expected ) {
+		$settings = [
+			'schema_title' => 'mediawiki/nonya',
+			'sample' => [
+				'rate' => 0.5,
+			],
+			'destination_event_service' => 'eventgate-analytics',
+			'producers' => [
+				'foo_producer' => [
+					'foo_setting' => false,
+				],
+				'bar_producer' => true,
+				'baz_producer' => 0.1,
+				'qux_producer' => [
+					'hello',
+					'world',
+				],
+			],
+		];
+
+		$streamConfig = new StreamConfig( 'nonya', $settings );
+		$this->assertEquals( $expected, $streamConfig->matchesSettings( $constraints ) );
 	}
 
 	/**

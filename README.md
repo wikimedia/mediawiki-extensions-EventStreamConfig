@@ -107,14 +107,39 @@ returns
 ### Notes on settings constraints
 
 When requesting stream configs via either the PHP or the HTTP API, you may provide an assoc array
-of settings constraints with which to filter the stream configs.   E.g., if you want to only
-return streams that all have `schema_title` == 'mediawiki/edit', you can provide this as a constraint.
+of settings constraints with which to filter the stream configs. For example, if you want to only return
+streams that have `schema_title == 'mediawiki/edit'`, then you can provide this as a constraint like so:
 
-EventStreamConfig uses PHP's `array_intersect_assoc` to match these constraints.  When using the HTTP
-API, it isn't possible to know the proper type of an incoming constraint value, so they are all
-provided as strings.  This is generally, good, as `array_intersec_assoc` compares values only
-after casting them to strings (!).  Be careful with boolean setting values though, as PHP is
-weird:
+```php
+$streamConfigs->get(
+    null,
+    /* $includeAllSettings = */ true,
+    [
+        'schema_title' => 'mediawiki/edit',
+    ]
+);
+```
+
+Further, constraints can be arbitrarily nested. Assuming that all streams published to by the
+EventLogging JavaScript client have `producer[mwext_eventlogging] = true`, you can only return those
+streams by providing a constraint like so:
+
+```php
+$streamConfigs->get(
+    null,
+    /* $includeAllSettings = */ true,
+    [
+        'producers' => [
+            'mwext_eventlogging' => true,
+        ]
+    ]
+);
+```
+
+When using the HTTP API, it isn't possible to know the proper type of an incoming constraint value, so
+they are all provided as strings.  This is handled by casting stream configuration values to strings
+before comparing them with the corresponding constraint value.  Be careful with boolean setting values
+though, as PHP is weird:
 
 ```php
 >>> (string)true
