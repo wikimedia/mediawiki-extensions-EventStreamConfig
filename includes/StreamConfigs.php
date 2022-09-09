@@ -90,9 +90,6 @@ class StreamConfigs {
 	 *
 	 * @param array|null $targetStreams
 	 *     List of stream names. If not provided, all stream configs will be returned.
-	 * @param bool $includeAllSettings
-	 *     Deprecated per https://phabricator.wikimedia.org/T286344. All settings will be returned
-	 *     regardless of the value of this parameter.
 	 * @param array|null $settingsConstraints
 	 *     If given, returned stream config entries will be filtered for those that
 	 *     have these settings.
@@ -101,9 +98,19 @@ class StreamConfigs {
 	 */
 	public function get(
 		array $targetStreams = null,
-		$includeAllSettings = false,
-		array $settingsConstraints = null
+		$settingsConstraints = null
 	): array {
+		$args = func_get_args();
+
+		if (
+			( count( $args ) === 2 && is_bool( $settingsConstraints ) ) ||
+			count( $args ) === 3
+		) {
+			wfDeprecatedMsg( __METHOD__ . ': $includeAllSettings parameter is deprecated', '1.41' );
+
+			$settingsConstraints = count( $args ) === 3 ? (array)$args[2] : null;
+		}
+
 		$result = [];
 		foreach ( $this->selectByStreams( $targetStreams ) as $stream => $streamConfigEntry ) {
 			if (

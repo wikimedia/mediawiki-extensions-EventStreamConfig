@@ -390,8 +390,32 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		$expected,
 		$message
 	) {
-		$result = $this->streamConfigs->get( $targetStreams, true, $constraints );
+		$result = $this->streamConfigs->get( $targetStreams, $constraints );
 		$this->assertEquals( $expected, $result, $message );
 	}
 
+	public function getDeprecatedParameterProvider() {
+		// TODO: Rewrite data providers using yield statements.
+		return [
+			[
+				[ 'nonya' ],
+				null,
+			],
+			[
+				[ 'nonya' ],
+				[
+					'destination_event_service' => 'eventgate-analytics',
+				],
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getDeprecatedParameterProvider
+	 */
+	public function testGetDeprecatedParameter( array $streamNames, array $constraints = null ) {
+		$this->expectDeprecationAndContinue( '/\$includeAllSettings parameter is deprecated/' );
+
+		$this->streamConfigs->get( $streamNames, true, $constraints );
+	}
 }

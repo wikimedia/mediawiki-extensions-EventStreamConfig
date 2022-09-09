@@ -16,10 +16,6 @@ use Wikimedia\ParamValidator\ParamValidator;
  *
  * Get stream config settings for specified streams
  *   GET /w/api.php?format=json&action=streamconfigs&streams=my-stream1|my-stream2
- *
- * Get stream config settings for specified streams including all settings, not just ones
- *   for client side usage.
- *   GET /w/api.php?format=json&action=streamconfigs&streams=my-stream1|my-stream2&all_settings
  */
 class ApiStreamConfigs extends ApiBase {
 	// 10 minutes
@@ -48,10 +44,7 @@ class ApiStreamConfigs extends ApiBase {
 	private const API_PARAM_CONSTRAINTS = 'constraints';
 
 	/**
-	 * By default, StreamConfigs#get will only return settings for streams
-	 * that are not disallowed in StreamConfig::INTERNAL_SETTINGS.
-	 * Specifying the all_settings parameter will have it return
-	 * all settings in the stream's config (like schema_title, etc.).
+	 * @deprecated since 1.41
 	 */
 	private const API_PARAM_ALL_SETTINGS = 'all_settings';
 
@@ -63,7 +56,6 @@ class ApiStreamConfigs extends ApiBase {
 		$this->getMain()->setCacheMaxAge( self::CACHE_MAX_AGE );
 
 		$targetStreams = $this->getParameter( self::API_PARAM_STREAMS );
-		$includeAllSettings = $this->getParameter( self::API_PARAM_ALL_SETTINGS );
 		$constraints = $this->getParameter( self::API_PARAM_CONSTRAINTS );
 
 		$settingsConstraints = $constraints ? self::multiParamToAssocArray( $constraints ) : null;
@@ -74,7 +66,6 @@ class ApiStreamConfigs extends ApiBase {
 
 		$result = $streamConfigs->get(
 			$targetStreams,
-			$includeAllSettings,
 			$settingsConstraints
 		);
 
@@ -103,6 +94,7 @@ class ApiStreamConfigs extends ApiBase {
 				ParamValidator::PARAM_ISMULTI => true,
 			],
 			self::API_PARAM_ALL_SETTINGS => [
+				ParamValidator::PARAM_DEPRECATED => true,
 				ParamValidator::PARAM_TYPE => 'boolean',
 			],
 		];
@@ -118,11 +110,11 @@ class ApiStreamConfigs extends ApiBase {
 					'apihelp-streamconfigs-example-1',
 
 			'action=streamconfigs&' . self::API_PARAM_STREAMS .
-			'=mediawiki.button-click&' . self::API_PARAM_ALL_SETTINGS  =>
+			'=mediawiki.button-click' =>
 					'apihelp-streamconfigs-example-2',
 
 			'action=streamconfigs&' . self::API_PARAM_STREAMS .
-			'=mediawiki.button-click&' . self::API_PARAM_ALL_SETTINGS .
+			'=mediawiki.button-click' .
 			'&constraints=event_service_name=eventgate-main' =>
 					'apihelp-streamconfigs-example-3',
 		];

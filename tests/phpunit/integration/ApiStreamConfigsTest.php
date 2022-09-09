@@ -39,7 +39,7 @@ class ApiStreamConfigsTest extends ApiTestCase {
 	}
 
 	public function testResultArrayFormat(): void {
-		$result = $this->doRequest( [ 'action' => 'streamconfigs', 'all_settings' => true ] );
+		$result = $this->doRequest( [ 'action' => 'streamconfigs' ] );
 		$this->assertSame( 'assoc', $result['streams'][ApiResult::META_TYPE] );
 
 		$testConfig = $result['streams']['test'];
