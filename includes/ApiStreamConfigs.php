@@ -26,15 +26,6 @@ class ApiStreamConfigs extends ApiBase {
 	private const CACHE_MAX_AGE = 600;
 
 	/**
-	 * List of stream config settings that should be returned from JSON-formatted API results as
-	 * JSON arrays ([]) rather than objects ({}).
-	 */
-	private const STREAM_CONFIG_LIST_SETTINGS = [
-		StreamConfig::TOPICS_SETTING,
-		StreamConfig::TOPIC_PREFIXES_SETTING,
-	];
-
-	/**
 	 * API query param used to specify target streams to get from Config
 	 */
 	private const API_PARAM_STREAMS = 'streams';
@@ -87,11 +78,15 @@ class ApiStreamConfigs extends ApiBase {
 			$settingsConstraints
 		);
 
-		// Recursively set all array values to be interpreted as associative arrays, so that they
-		// are returned as JSON objects ({}) from a JSON-formatted response. Exclude keys which
-		// are known to have list-typed values.
-		self::conditionallySetArrayTypeRecursive( $result, 'assoc',
-			self::STREAM_CONFIG_LIST_SETTINGS );
+		// Ensure that empty stream configs are serialized as objects ({}) and not as lists ([]).
+		//
+		// See https://phabricator.wikimedia.org/T259917 and
+		// https://phabricator.wikimedia.org/T323032 for additional context.
+		foreach ( $result as &$value ) {
+			ApiResult::setArrayType( $value, 'assoc' );
+		}
+
+		ApiResult::setArrayType( $result, 'assoc' );
 
 		$this->getResult()->addValue( null, "streams", $result );
 	}
@@ -172,25 +167,5 @@ class ApiStreamConfigs extends ApiBase {
 			},
 			[]
 		);
-	}
-
-	/**
-	 * A clone of ApiResult::setArrayTypeRecursive, updated to exclude specific keys.
-	 * @param array &$arr
-	 * @param string $type
-	 * @param array $excludeKeys
-	 */
-	private static function conditionallySetArrayTypeRecursive(
-		array &$arr,
-		string $type,
-		array $excludeKeys = []
-	): void {
-		ApiResult::setArrayType( $arr, $type );
-		foreach ( $arr as $k => &$v ) {
-			if ( !ApiResult::isMetadataKey( $k ) && is_array( $v ) &&
-				!in_array( $k, $excludeKeys ) ) {
-				self::conditionallySetArrayTypeRecursive( $v, $type, $excludeKeys );
-			}
-		}
 	}
 }

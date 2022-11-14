@@ -46,7 +46,7 @@ class ApiStreamConfigsTest extends ApiTestCase {
 		$this->assertSame( 'assoc', $testConfig[ApiResult::META_TYPE] );
 		$this->assertArrayNotHasKey( ApiResult::META_TYPE, $testConfig[StreamConfig::TOPICS_SETTING] );
 		$this->assertArrayNotHasKey( ApiResult::META_TYPE, $testConfig[StreamConfig::TOPIC_PREFIXES_SETTING] );
-		$this->assertSame( 'assoc', $testConfig['other-setting'][ApiResult::META_TYPE] );
+		$this->assertArrayNotHasKey( ApiResult::META_TYPE, $testConfig['other-setting'] );
 
 		// Make sure true and false are serialized correctly in output using formatversion=2
 		$this->assertSame( true, $result['streams']['test']['true-setting'] );
