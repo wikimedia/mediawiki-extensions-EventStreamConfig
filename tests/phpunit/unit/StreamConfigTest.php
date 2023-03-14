@@ -461,7 +461,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		];
 
 		$streamConfig = new StreamConfig( 'nonya', $settings );
-		$this->assertEquals( $streamConfig->topics(), [ 'nonya' ] );
+		$this->assertEquals( [ 'nonya' ], $streamConfig->topics() );
 	}
 
 	public function testTopicsWithTopicPrefixes() {
@@ -475,7 +475,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		];
 
 		$streamConfig = new StreamConfig( 'nonya', $settings );
-		$this->assertEquals( $streamConfig->topics(), [ 'eqiad.nonya', 'codfw.nonya' ] );
+		$this->assertEquals( [ 'eqiad.nonya', 'codfw.nonya' ], $streamConfig->topics() );
 	}
 
 	public function testTopicsStreamRegexSettingWithoutTopicPrefixes() {
@@ -485,7 +485,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		];
 
 		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
-		$this->assertEquals( $streamConfig->topics(), [ '/^mediawiki\.job\..+/' ] );
+		$this->assertEquals( [ '/^mediawiki\.job\..+/' ], $streamConfig->topics() );
 	}
 
 	public function testTopicsStreamRegexSettingWithTopicPrefixes() {
@@ -496,7 +496,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		];
 
 		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
-		$this->assertEquals( $streamConfig->topics(), [ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ] );
+		$this->assertEquals( [ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ], $streamConfig->topics() );
 	}
 
 	public function testTopicsTargetStreamNameWithoutTopicPrefixes() {
@@ -507,8 +507,8 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertEquals(
-			$streamConfig->topics( 'mediawiki.job.workworkwork' ),
-			[ 'mediawiki.job.workworkwork' ]
+			[ 'mediawiki.job.workworkwork' ],
+			$streamConfig->topics( 'mediawiki.job.workworkwork' )
 		);
 	}
 
@@ -521,8 +521,8 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertEquals(
-			$streamConfig->topics( 'mediawiki.job.workworkwork' ),
-			[ 'eqiad.mediawiki.job.workworkwork', 'codfw.mediawiki.job.workworkwork' ]
+			[ 'eqiad.mediawiki.job.workworkwork', 'codfw.mediawiki.job.workworkwork' ],
+			$streamConfig->topics( 'mediawiki.job.workworkwork' )
 		);
 	}
 
@@ -534,8 +534,8 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertEquals(
-			$streamConfig->topics( '/^mediawiki\.job\..+/' ),
-			[ '/^mediawiki\.job\..+/' ]
+			[ '/^mediawiki\.job\..+/' ],
+			$streamConfig->topics( '/^mediawiki\.job\..+/' )
 		);
 	}
 
@@ -548,8 +548,8 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertEquals(
-			$streamConfig->topics( '/^mediawiki\.job\..+/' ),
-			[ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ]
+			[ '/^(eqiad\.|codfw\.)mediawiki\.job\..+/' ],
+			$streamConfig->topics( '/^mediawiki\.job\..+/' )
 		);
 	}
 
