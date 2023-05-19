@@ -8,7 +8,7 @@
 	"license-name": "GPL-2.0-or-later",
 	"type": "other",
 	"requires": {
-		"MediaWiki": ">= 1.35.0"
+		"MediaWiki": ">= 1.40.0"
 	},
 	"AutoloadNamespaces": {
 		"MediaWiki\\Extension\\EventStreamConfig\\": "includes/"
@@ -32,7 +32,6 @@
 		"EventStreamsDefaultSettings": {
 			"value": {},
 			"description": "Stream config default settings. Any setting here will be set in each entry in EventStreams if it is not set there already."
-
 		}
 	},
 	"manifest_version": 2

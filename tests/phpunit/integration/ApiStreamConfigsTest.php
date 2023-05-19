@@ -5,7 +5,7 @@ namespace MediaWiki\Extension\EventStreamConfig;
 use ApiMain;
 use ApiResult;
 use ApiTestCase;
-use FauxRequest;
+use MediaWiki\Request\FauxRequest;
 use RequestContext;
 
 /**
