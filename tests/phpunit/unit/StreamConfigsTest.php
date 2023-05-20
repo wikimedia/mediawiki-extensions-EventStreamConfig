@@ -84,7 +84,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		$this->streamConfigs = new StreamConfigs( $options, $logger );
 	}
 
-	public function streamConfigsGetProvider() {
+	public static function streamConfigsGetProvider() {
 		return [
 
 			[
@@ -394,7 +394,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( $expected, $result, $message );
 	}
 
-	public function getDeprecatedParameterProvider() {
+	public static function getDeprecatedParameterProvider() {
 		// TODO: Rewrite data providers using yield statements.
 		return [
 			[

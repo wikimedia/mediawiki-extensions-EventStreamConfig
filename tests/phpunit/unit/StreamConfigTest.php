@@ -296,7 +296,7 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertFalse( $streamConfig->matchesSettings( $constraints ) );
 	}
 
-	public function provideMatchesSettingsRecursive(): Generator {
+	public static function provideMatchesSettingsRecursive(): Generator {
 		yield [
 			'constraints' => [
 				'producers' => [
