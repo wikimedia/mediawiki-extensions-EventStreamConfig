@@ -1,7 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
-			"Vlad5250"
+			"Winston Sung"
 		]
 	},
 	"eventstreamconfig-desc": "Izlaže konfiguraciju toka događaja u krajnjoj točki priložnika. Možese koristiti za njeno davanje i putem ResourceLoadera",
