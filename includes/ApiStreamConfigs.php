@@ -89,6 +89,7 @@ class ApiStreamConfigs extends ApiBase {
 		return [
 			self::API_PARAM_STREAMS => [
 				ParamValidator::PARAM_ISMULTI => true,
+				ParamValidator::PARAM_ISMULTI_LIMIT1 => 250,
 			],
 			self::API_PARAM_CONSTRAINTS => [
 				ParamValidator::PARAM_ISMULTI => true,
