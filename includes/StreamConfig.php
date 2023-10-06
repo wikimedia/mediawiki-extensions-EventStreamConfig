@@ -284,9 +284,8 @@ class StreamConfig {
 		// FIXME: This is very ugly, and not very safe.
 		// Temporarily disable errors/warnings when checking if valid regex.
 		$errorLevel = error_reporting( E_ERROR );
-		// @phan-suppress-next-next-line PhanParamSuspiciousOrder false positive
-		// @phan-suppress-next-line PhanTypeMismatchArgumentInternalProbablyReal false positive
-		$isValid = mb_substr( $string, 0, 1 ) === '/' && preg_match( $string, null ) !== false;
+		// @phan-suppress-next-line PhanParamSuspiciousOrder false positive
+		$isValid = mb_substr( $string, 0, 1 ) === '/' && preg_match( $string, '' ) !== false;
 		error_reporting( $errorLevel );
 		return $isValid;
 	}
