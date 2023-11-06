@@ -1,0 +1,13 @@
+{
+	"@metadata": {
+		"authors": [
+			"McDutchie"
+		]
+	},
+	"eventstreamconfig-desc": "Stelt de configuratie van de gebeurtenisstroom beschikbaar in een API-eindpunt. Kan ook worden gebruikt om configuraties beschikbaar te stellen via ResourceLoader",
+	"apihelp-streamconfigs-param-streams": "Lijst met streams waarvoor configuratie moet worden opgehaald",
+	"apihelp-streamconfigs-param-constraints": "Resultaten filteren voor streamconfiguratie-items die deze instellingen hebben",
+	"apihelp-streamconfigs-example-1": "Streamconfiguraties ophalen voor een lijst met streams",
+	"apihelp-streamconfigs-example-2": "Streamconfiguratie ophalen voor streams met alle instellingen",
+	"apihelp-streamconfigs-example-3": "Streamconfiguratie ophalen voor streams met instellingen die overeenkomen met deze beperkingen"
+}
