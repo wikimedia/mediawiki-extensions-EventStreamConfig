@@ -2,7 +2,7 @@
 
 This extension provides library functions and an API endpoint for exporting event stream configuration from the `$wgEventStreams` MediaWiki configuration variable.
 
-This allows for centralized configuration of streams for both Mediawiki and external uses.
+This allows for centralized configuration of streams for both MediaWiki and external uses.
 
 - The [EventLogging extension](T223931) uses this with [ResourceLoader](https://www.mediawiki.org/wiki/ResourceLoader) to load configs for streams used on certain pages to dynamically configure client stream settings, like sampling rate.
 - Mobile apps use the API endpoint to dynamically configure client stream settings like sample rate.
