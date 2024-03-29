@@ -4,6 +4,7 @@ namespace MediaWiki\Extension\EventStreamConfig;
 
 use MediaWiki\Config\ServiceOptions;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Wikimedia\Assert\Assert;
 
 /**
@@ -41,6 +42,8 @@ class StreamConfigs {
 	/**
 	 * Name of the main config key(s) for stream configuration.
 	 * @var array
+	 *
+	 * @deprecated since 1.42
 	 */
 	public const CONSTRUCTOR_OPTIONS = [
 		'EventStreams',
@@ -62,27 +65,35 @@ class StreamConfigs {
 	 * Constructs a new StreamConfigs instance initialized
 	 * from wgEventStreams and wgEventStreamsDefaultSettings
 	 *
-	 * @param ServiceOptions $options
-	 * @param LoggerInterface $logger
+	 * @param array<string,array>|ServiceOptions $streamConfigs
+	 * @param array|LoggerInterface $defaultSettings
+	 * @param ?LoggerInterface $logger
 	 */
-	public function __construct( ServiceOptions $options, LoggerInterface $logger ) {
-		$options->assertRequiredOptions( self::CONSTRUCTOR_OPTIONS );
+	public function __construct( $streamConfigs, $defaultSettings, ?LoggerInterface $logger = null ) {
+		if ( $streamConfigs instanceof ServiceOptions ) {
+			wfDeprecatedMsg( __METHOD__ . ': calling with ServiceOptions is deprecated', '1.42' );
 
-		$streamConfigs = $options->get( 'EventStreams' );
+			$streamConfigs->assertRequiredOptions( self::CONSTRUCTOR_OPTIONS );
+
+			'@phan-var LoggerInterface $defaultSettings';
+			$logger = $defaultSettings;
+
+			$defaultSettings = $streamConfigs->get( 'EventStreamsDefaultSettings' );
+			$streamConfigs = $streamConfigs->get( 'EventStreams' );
+		}
+
 		Assert::parameterType( 'array', $streamConfigs, 'EventStreams' );
-
-		$defaultSettings = $options->get( 'EventStreamsDefaultSettings' );
 		Assert::parameterType( 'array', $defaultSettings, 'EventStreamsDefaultSettings' );
 
 		foreach ( $streamConfigs as $key => $config ) {
-			// Backwards compatibility for when stream configs used to be an integer indexed array.
-			$stream = is_int( $key ) && isset( $config[StreamConfig::STREAM_SETTING] ) ?
-				$config[StreamConfig::STREAM_SETTING] :
+			$stream = is_int( $key ) && isset( $config[ StreamConfig::STREAM_SETTING ] ) ?
+				$config[ StreamConfig::STREAM_SETTING ] :
 				$key;
+
 			$this->streamConfigs[ $stream ] = new StreamConfig( $stream, $config, $defaultSettings );
 		}
 
-		$this->logger = $logger;
+		$this->logger = $logger ?? new NullLogger();
 	}
 
 	/**

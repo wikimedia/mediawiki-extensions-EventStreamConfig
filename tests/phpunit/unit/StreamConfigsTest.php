@@ -2,7 +2,6 @@
 
 namespace MediaWiki\Extension\EventStreamConfig;
 
-use MediaWiki\Config\ServiceOptions;
 use MediaWikiUnitTestCase;
 use Psr\Log\NullLogger;
 
@@ -73,17 +72,15 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 	public function setUp(): void {
 		parent::setUp();
-		$options = new ServiceOptions(
-			StreamConfigs::CONSTRUCTOR_OPTIONS,
-			[
-				'EventStreams' => self::STREAM_CONFIGS_FIXTURE,
-				'EventStreamsDefaultSettings' => self::STREAM_CONFIG_DEFAULT_SETTINGS_FIXTURE
-			]
-		);
+
 		$logger = new NullLogger();
 
 		// Use $this->streamConfigs in (most) tests below.
-		$this->streamConfigs = new StreamConfigs( $options, $logger );
+		$this->streamConfigs = new StreamConfigs(
+			self::STREAM_CONFIGS_FIXTURE,
+			self::STREAM_CONFIG_DEFAULT_SETTINGS_FIXTURE,
+			$logger
+		);
 	}
 
 	public static function streamConfigsGetProvider() {
