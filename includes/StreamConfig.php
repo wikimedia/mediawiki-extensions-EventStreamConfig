@@ -64,7 +64,7 @@ class StreamConfig {
 	 *        An array with default stream config settings.
 	 */
 	public function __construct( string $stream, array $settings, array $defaultSettings = [] ) {
-		$this->settings = $settings + $defaultSettings;
+		$this->settings = array_replace_recursive( $defaultSettings, $settings );
 
 		// To preserve backward compatibility, add the stream name or regex pattern to the config body
 		// as the 'stream' setting. This can likely be removed if we're sure nothing is relying on it.

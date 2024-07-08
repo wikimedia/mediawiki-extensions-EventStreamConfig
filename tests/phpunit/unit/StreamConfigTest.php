@@ -85,6 +85,57 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	/**
 	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::toArray()
 	 */
+	public function testToArrayAllSettingsWithDeeplyMergedDefaults() {
+		$settings = [
+			'schema_title' => 'mediawiki/nonya',
+			'destination_event_service' => 'eventgate-analytics',
+			'topics' => [ 'nonya' ],
+			'consumers' => [
+				'analytics_hadoop_ingestion' => [
+					'job_name' => 'nonya'
+				],
+			],
+		];
+
+		$streamSetting = [
+			'stream' => 'nonya'
+		];
+
+		$defaultSettings = [
+			'consumers' => [
+				'analytics_hadoop_ingestion' => [
+					'job_name' => 'event_default',
+					'enabled' => true,
+				],
+				'analytics_hive_ingestion' => [
+					'enabled' => false,
+				],
+			],
+		];
+
+		$expected = [
+			'stream' => 'nonya',
+			'schema_title' => 'mediawiki/nonya',
+			'destination_event_service' => 'eventgate-analytics',
+			'topics' => [ 'nonya' ],
+			'consumers' => [
+				'analytics_hadoop_ingestion' => [
+					'job_name' => 'nonya',
+					'enabled' => true,
+				],
+				'analytics_hive_ingestion' => [
+					'enabled' => false,
+				],
+			],
+		];
+
+		$streamConfig = new StreamConfig( 'nonya', $settings, $defaultSettings );
+		$this->assertEquals( $expected, $streamConfig->toArray() );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::toArray()
+	 */
 	public function testToArrayWithTopicPrefixesAllSettings() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
