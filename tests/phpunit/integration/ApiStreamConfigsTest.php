@@ -17,7 +17,7 @@ class ApiStreamConfigsTest extends ApiTestCase {
 
 	public function setUp(): void {
 		parent::setUp();
-		$this->setMwGlobals( 'wgEventStreams', [
+		$this->overrideConfigValue( 'EventStreams', [
 			'test' => [
 				StreamConfig::STREAM_SETTING => 'test',
 				StreamConfig::TOPICS_SETTING => [ 'topic' ],

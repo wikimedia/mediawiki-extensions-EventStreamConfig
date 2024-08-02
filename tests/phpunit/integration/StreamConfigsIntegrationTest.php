@@ -71,9 +71,9 @@ class StreamConfigsIntegrationTest
 	 * @covers \MediaWiki\Extension\EventStreamConfig\StreamConfigs::__construct()
 	 */
 	public function testMediaWikiServiceIntegration() {
-		$this->setMwGlobals( [
-			'wgEventStreams' => self::STREAM_CONFIGS_FIXTURE,
-			'wgEventStreamsDefaultSettings' => [
+		$this->overrideConfigValues( [
+			'EventStreams' => self::STREAM_CONFIGS_FIXTURE,
+			'EventStreamsDefaultSettings' => [
 				'topic_prefixes' => [
 					'eqiad.'
 				],
