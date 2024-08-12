@@ -4,7 +4,6 @@ namespace MediaWiki\Extension\EventStreamConfig;
 
 use ApiMain;
 use ApiResult;
-use MediaWiki\Context\RequestContext;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Tests\Api\ApiTestCase;
 
@@ -60,10 +59,9 @@ class ApiStreamConfigsTest extends ApiTestCase {
 	 * @return mixed
 	 */
 	private function doRequest( array $params ) {
-		global $wgRequest;
-		$wgRequest = new FauxRequest( $params, true );
-		RequestContext::getMain()->setRequest( $wgRequest );
-		$context = $this->apiContext->newTestContext( $wgRequest );
+		$request = new FauxRequest( $params, true );
+		$this->setRequest( $request );
+		$context = $this->apiContext->newTestContext( $request );
 		$module = new ApiMain( $context );
 		$module->execute();
 		return $module->getResult()->getResultData();
