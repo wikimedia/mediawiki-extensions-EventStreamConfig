@@ -2,8 +2,8 @@
 
 namespace MediaWiki\Extension\EventStreamConfig;
 
-use ApiBase;
-use ApiResult;
+use MediaWiki\Api\ApiBase;
+use MediaWiki\Api\ApiResult;
 use MediaWiki\MediaWikiServices;
 use Wikimedia\ParamValidator\ParamValidator;
 

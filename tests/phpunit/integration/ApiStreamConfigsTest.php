@@ -2,8 +2,8 @@
 
 namespace MediaWiki\Extension\EventStreamConfig;
 
-use ApiMain;
-use ApiResult;
+use MediaWiki\Api\ApiMain;
+use MediaWiki\Api\ApiResult;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Tests\Api\ApiTestCase;
 

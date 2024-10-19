@@ -1,7 +1,7 @@
 <?php
 namespace MediaWiki\Extension\EventStreamConfig;
 
-use ApiFormatJson;
+use MediaWiki\Api\ApiFormatJson;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
