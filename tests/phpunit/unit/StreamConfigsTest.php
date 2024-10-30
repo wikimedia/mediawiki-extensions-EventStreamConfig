@@ -412,7 +412,7 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 	/**
 	 * @dataProvider getDeprecatedParameterProvider
 	 */
-	public function testGetDeprecatedParameter( array $streamNames, array $constraints = null ) {
+	public function testGetDeprecatedParameter( array $streamNames, ?array $constraints = null ) {
 		$this->expectDeprecationAndContinue( '/\$includeAllSettings parameter is deprecated/' );
 
 		$this->streamConfigs->get( $streamNames, true, $constraints );
