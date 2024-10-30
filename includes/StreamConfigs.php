@@ -108,7 +108,7 @@ class StreamConfigs {
 	 * @return array
 	 */
 	public function get(
-		array $targetStreams = null,
+		?array $targetStreams = null,
 		$settingsConstraints = null
 	): array {
 		$args = func_get_args();
@@ -142,7 +142,7 @@ class StreamConfigs {
 	 *
 	 * @return StreamConfig[]
 	 */
-	private function selectByStreams( array $targetStreams = null ): array {
+	private function selectByStreams( ?array $targetStreams = null ): array {
 		// If no $targetStreams were specified, then assume all are desired.
 		if ( $targetStreams === null ) {
 			$this->logger->debug( 'Selecting all stream configs.' );
