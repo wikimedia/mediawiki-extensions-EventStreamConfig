@@ -1,11 +1,12 @@
 {
 	"@metadata": {
 		"authors": [
-			"JRyan"
+			"JRyan",
+			"Lejonel"
 		]
 	},
 	"eventstreamconfig-desc": "Visar händelseströmmar i en API-slutpunkt. Kan också användas för att visa konfigurationer via ResourceLoader.",
-	"apihelp-streamconfigs-summary": "Visar konfiguration för händelseström. Återkommer endast format=json med formatversion=2.",
+	"apihelp-streamconfigs-summary": "Visar konfiguration för händelseström. Returnerar endast format=json med formatversion=2.",
 	"apihelp-streamconfigs-param-streams": "Lista över strömmar för att hämta konfiguration ifrån",
 	"apihelp-streamconfigs-param-all_settings": "Inkludera alla inställningar i strömkonfigurationsresultater",
 	"apihelp-streamconfigs-param-constraints": "Filtrera resultat för strömkonfigurationsposter som har dessa inställningarna.",
