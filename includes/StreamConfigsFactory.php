@@ -22,20 +22,16 @@ class StreamConfigsFactory {
 		'EventStreamsDefaultSettings',
 	];
 
-	private ServiceOptions $options;
 	private HookRunner $hookRunner;
-	private LoggerInterface $logger;
 
 	public function __construct(
-		ServiceOptions $options,
+		private readonly ServiceOptions $options,
 		HookContainer $hookContainer,
-		LoggerInterface $logger
+		private readonly LoggerInterface $logger,
 	) {
 		$options->assertRequiredOptions( self::CONSTRUCTOR_OPTIONS );
 
-		$this->options = $options;
 		$this->hookRunner = new HookRunner( $hookContainer );
-		$this->logger = $logger;
 	}
 
 	/**
