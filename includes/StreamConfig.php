@@ -233,7 +233,7 @@ class StreamConfig {
 			$actual = $lhs[$key];
 
 			if ( is_array( $expected ) && is_array( $actual ) ) {
-				if ( $this->arrayIsList( $expected ) && $this->arrayIsList( $actual ) ) {
+				if ( array_is_list( $expected ) && array_is_list( $actual ) ) {
 					return array_intersect( $expected, $actual ) === $expected;
 				}
 
@@ -254,23 +254,6 @@ class StreamConfig {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Gets whether the array is a list, i.e. an integer-indexed array with indices starting at 0.
-	 *
-	 * As written, this method trades performance for elegance. This method should not be called on
-	 * large arrays.
-	 *
-	 * TODO: Replace this with array_is_list when MediaWiki supports PHP >= 8.1
-	 *
-	 * @param array $array
-	 * @return bool
-	 */
-	private function arrayIsList( $array ) {
-		$array = array_keys( $array );
-
-		return $array === array_keys( $array );
 	}
 
 	/**
@@ -297,12 +280,12 @@ class StreamConfig {
 	 * @throws \InvalidArgumentException if stream config settings are invalid
 	 */
 	private static function validate( array $settings ) {
-		Assert::parameter(
-			isset( $settings[self::STREAM_SETTING] ),
-			self::STREAM_SETTING,
-			self::STREAM_SETTING . ' not set in stream config entry ' .
+		if ( !isset( $settings[self::STREAM_SETTING] ) ) {
+			throw new \InvalidArgumentException(
+				self::STREAM_SETTING . ' not set in stream config entry ' .
 				var_export( $settings, true )
-		);
+			);
+		}
 		$stream = $settings[self::STREAM_SETTING];
 
 		Assert::parameterType( 'string', $stream, self::STREAM_SETTING );
