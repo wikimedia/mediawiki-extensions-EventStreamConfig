@@ -99,13 +99,13 @@ class StreamConfigs {
 	/**
 	 * Looks for target stream names and returns matched stream configs keyed by stream name.
 	 *
-	 * @param array|null $targetStreams
+	 * @param string[]|null $targetStreams
 	 *     List of stream names. If not provided, all stream configs will be returned.
 	 * @param array|null $settingsConstraints
 	 *     If given, returned stream config entries will be filtered for those that
 	 *     have these settings.
 	 *
-	 * @return array
+	 * @return array<string,array>
 	 */
 	public function get(
 		?array $targetStreams = null,
@@ -137,7 +137,7 @@ class StreamConfigs {
 	/**
 	 * Filter for stream names that match streams in $targetStreamNames.
 	 *
-	 * @param array|null $targetStreams
+	 * @param string[]|null $targetStreams
 	 *     If not provided, all $streamConfigs will be returned, keyed by 'stream'.
 	 *
 	 * @return StreamConfig[]
