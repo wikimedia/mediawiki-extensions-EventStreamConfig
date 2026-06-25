@@ -13,9 +13,6 @@ use TypeError;
  */
 class StreamConfigTest extends MediaWikiUnitTestCase {
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::stream()
-	 */
 	public function testStream() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -29,9 +26,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( 'nonya', $streamConfig->stream() );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::toArray()
-	 */
 	public function testToArray() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -55,9 +49,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( $expected, $streamConfig->toArray() );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::toArray()
-	 */
 	public function testToArrayAllSettingsWithDefaults() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -82,9 +73,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( $expected, $streamConfig->toArray() );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::toArray()
-	 */
 	public function testToArrayAllSettingsWithDeeplyMergedDefaults() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -133,9 +121,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( $expected, $streamConfig->toArray() );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::toArray()
-	 */
 	public function testToArrayWithTopicPrefixesAllSettings() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -157,9 +142,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( $expected, $streamConfig->toArray() );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matches()
-	 */
 	public function testMatchesString() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -173,9 +155,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertTrue( $streamConfig->matches( 'nonya' ) );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matches()
-	 */
 	public function testMatchesRegex() {
 		$settings = [
 			'schema_title' => 'mediawiki/job',
@@ -189,9 +168,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertTrue( (bool)$streamConfig->matches( 'mediawiki.job.workworkwork' ) );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matches()
-	 */
 	public function testGivenRegexStreamDoesNotMatch() {
 		$settings = [
 			'schema_title' => 'mediawiki/job',
@@ -208,9 +184,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertFalse( (bool)$streamConfig->matches( '/^mediawiki\.job\..+/' ) );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::__construct()
-	 */
 	public function testMissingStreamName() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -223,9 +196,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		new StreamConfig( null, $settings );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::__construct()
-	 */
 	public function testInvalidStreamNameRegex() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -238,9 +208,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		new StreamConfig( '/nonya/BADREGEX', $settings );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
-	 */
 	public function testMatchesSettings() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -258,9 +225,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
-	 */
 	public function testMatchesSettingsBoolean() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -283,7 +247,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 * PHP's array_intersect_assoc casts true to "1" before comparing.
 	 * So, if we want to compare with a string constraint value to a boolean setting,
 	 * we must pre-cast the constraint value to "1".
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
 	 */
 	public function testMatchesSettingsBooleanStringTrue() {
 		$settings = [
@@ -307,7 +270,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 	 * PHP's array_intersect_assoc casts false to "" before comparing.
 	 * So, if we want to compare with a string constraint value to a boolean setting,
 	 * we must pre-cast the constraint value to "".
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
 	 */
 	public function testMatchesSettingsBooleanStringFalse() {
 		$settings = [
@@ -327,9 +289,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
-	 */
 	public function testNotMatchesSettings() {
 		$settings = [
 			'schema_title' => 'mediawiki/nonya',
@@ -448,7 +407,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 	/**
 	 * @dataProvider provideMatchesSettingsRecursive
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
 	 */
 	public function testMatchesSettingsRecursive( array $constraints, bool $expected ) {
 		$settings = [
@@ -474,9 +432,6 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( $expected, $streamConfig->matchesSettings( $constraints ) );
 	}
 
-	/**
-	 * @covers MediaWiki\Extension\EventStreamConfig\StreamConfig::matchesSettings()
-	 */
 	public function testMatchesSettingsStreamRegex() {
 		$settings = [
 			'schema_title' => 'mediawiki/job',
