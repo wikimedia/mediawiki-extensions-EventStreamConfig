@@ -7,10 +7,11 @@
 	"eventstreamconfig-desc": "Exposes event stream config in an API endpoint. Can also be used to expose configs via ResourceLoader",
 	"apihelp-streamconfigs-summary": "Exposes event stream config. Returns only format=json with formatversion=2.",
 	"apihelp-streamconfigs-param-streams": "List of streams to get config for",
-	"apihelp-streamconfigs-param-all_settings": "Include all settings in stream config results. Deprecated since 1.41. All settings are included by default.",
 	"apihelp-streamconfigs-param-constraints": "Filter results for stream config entries that have these settings",
+	"apihelp-streamconfigs-param-any_constraints": "Filter results for stream config entries that have one or more of these settings. Can be used together with <var>constraints</var>.",
 	"apihelp-streamconfigs-example-1": "Get stream configs for a list of streams",
 	"apihelp-streamconfigs-example-2": "Get stream config for streams with all settings",
-	"apihelp-streamconfigs-example-3": "Get stream config for streams that have settings matching these constraints"
+	"apihelp-streamconfigs-example-3": "Get stream config for streams that have settings matching these constraints",
+	"apihelp-streamconfigs-example-4": "Get stream config for streams that have one or more settings matching these constraints"
 
 }

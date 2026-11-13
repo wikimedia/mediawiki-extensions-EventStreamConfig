@@ -210,6 +210,34 @@ class StreamConfig {
 	}
 
 	/**
+	 * Returns true if this StreamConfig matches one or more items in $anySettingsConstraints.
+	 * Each item is an array of settings constraints.
+	 * This function uses $this->matchesSettings to match each item.
+	 * If $anySettingsConstraints is empty, this function returns false.
+	 *
+	 * Example:
+	 * @code
+	 *   [
+	 *       [ 'destination_event_service' => 'eventgate-main' ],
+	 *       [ 'producers' => [ 'mediawiki_eventbus' => [ 'event_service_name' => 'eventgate-main' ] ] ],
+	 *   ]
+	 * @endcode
+	 *
+	 * @param array[] $anySettingsConstraints
+	 * @return bool
+	 */
+	public function matchesAnySettings( array $anySettingsConstraints ): bool {
+		Assert::parameterElementType( 'array', $anySettingsConstraints, '$anySettingsConstraints' );
+
+		foreach ( $anySettingsConstraints as $settingsConstraints ) {
+			if ( $this->matchesSettings( $settingsConstraints ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Partially matches two arrays, LHS and RHS, with one another up to a maximum depth. LHS and
 	 * RHS are considered a partial match if LHS contains all of RHS.
 	 *
@@ -235,7 +263,11 @@ class StreamConfig {
 
 			if ( is_array( $expected ) && is_array( $actual ) ) {
 				if ( array_is_list( $expected ) && array_is_list( $actual ) ) {
-					return array_intersect( $expected, $actual ) === $expected;
+					if ( array_intersect( $expected, $actual ) !== $expected ) {
+						return false;
+					}
+					// Do not return here. Examine the remaining constraints.
+					continue;
 				}
 
 				if ( !$this->isPartialMatch( $actual, $expected, $maxDepth - 1 ) ) {

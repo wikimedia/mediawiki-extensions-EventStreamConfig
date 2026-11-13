@@ -104,29 +104,29 @@ class StreamConfigs {
 	 * @param array|null $settingsConstraints
 	 *     If given, returned stream config entries will be filtered for those that
 	 *     have these settings.
+	 * @param array[]|null $anySettingsConstraints
+	 *     Optional. A list of settings constraints. This function returns only the
+	 *     stream config entries that match one or more items in this list. This function
+	 *     also applies $settingsConstraints. Refer to StreamConfig::matchesAnySettings.
 	 *
 	 * @return array<string,array>
 	 */
 	public function get(
 		?array $targetStreams = null,
-		$settingsConstraints = null
+		?array $settingsConstraints = null,
+		?array $anySettingsConstraints = null
 	): array {
-		$args = func_get_args();
-
-		if (
-			( count( $args ) === 2 && is_bool( $settingsConstraints ) ) ||
-			count( $args ) === 3
-		) {
-			wfDeprecatedMsg( __METHOD__ . ': $includeAllSettings parameter is deprecated', '1.41' );
-
-			$settingsConstraints = count( $args ) === 3 ? (array)$args[2] : null;
-		}
-
 		$result = [];
 		foreach ( $this->selectByStreams( $targetStreams ) as $stream => $streamConfigEntry ) {
 			if (
-				!$settingsConstraints ||
-				$streamConfigEntry->matchesSettings( $settingsConstraints )
+				(
+					!$settingsConstraints ||
+					$streamConfigEntry->matchesSettings( $settingsConstraints )
+				) &&
+				(
+					!$anySettingsConstraints ||
+					$streamConfigEntry->matchesAnySettings( $anySettingsConstraints )
+				)
 			) {
 				$result[$stream] = $streamConfigEntry->toArray( $stream );
 			}

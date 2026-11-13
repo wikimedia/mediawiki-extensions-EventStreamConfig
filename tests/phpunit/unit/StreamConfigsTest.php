@@ -4,6 +4,7 @@ namespace MediaWiki\Extension\EventStreamConfig;
 
 use MediaWikiUnitTestCase;
 use Psr\Log\NullLogger;
+use Wikimedia\Assert\ParameterElementTypeException;
 
 /**
  * @covers \MediaWiki\Extension\EventStreamConfig\StreamConfigs
@@ -66,6 +67,44 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 
 	private const STREAM_CONFIG_DEFAULT_SETTINGS_FIXTURE = [
 		'topic_prefixes' => [ 'eqiad.', 'codfw.' ]
+	];
+
+	private const ANY_CONSTRAINTS_STREAM_CONFIGS_FIXTURE = [
+		'legacy_only' => [
+			'schema_title' => 'schema_a',
+			'destination_event_service' => 'eventgate-main',
+		],
+		'producer_only' => [
+			'schema_title' => 'schema_b',
+			'producers' => [
+				'mediawiki_eventbus' => [
+					'event_service_name' => 'eventgate-main',
+				],
+			],
+		],
+		'legacy_and_producer' => [
+			'schema_title' => 'schema_a',
+			'destination_event_service' => 'eventgate-main',
+			'producers' => [
+				'mediawiki_eventbus' => [
+					'event_service_name' => 'eventgate-main',
+				],
+			],
+		],
+		'other_service' => [
+			'schema_title' => 'schema_a',
+			'destination_event_service' => 'eventgate-analytics',
+			'producers' => [
+				'mediawiki_eventbus' => [
+					'event_service_name' => 'eventgate-analytics',
+				],
+			],
+		],
+	];
+
+	private const EVENTGATE_MAIN_ANY_CONSTRAINTS = [
+		[ 'destination_event_service' => 'eventgate-main' ],
+		[ 'producers' => [ 'mediawiki_eventbus' => [ 'event_service_name' => 'eventgate-main' ] ] ],
 	];
 
 	private StreamConfigs $streamConfigs;
@@ -393,28 +432,79 @@ class StreamConfigsTest extends MediaWikiUnitTestCase {
 		$this->assertEquals( $expected, $result, $message );
 	}
 
-	public static function getDeprecatedParameterProvider() {
-		// TODO: Rewrite data providers using yield statements.
-		return [
-			[
-				[ 'nonya' ],
-				null,
+	public static function provideGetAnySettingsConstraints() {
+		yield 'any constraints only' => [
+			'targetStreams' => null,
+			'constraints' => null,
+			'anyConstraints' => self::EVENTGATE_MAIN_ANY_CONSTRAINTS,
+			'expectedStreams' => [ 'legacy_only', 'producer_only', 'legacy_and_producer' ],
+		];
+
+		yield 'any constraints and constraints' => [
+			'targetStreams' => null,
+			'constraints' => [ 'schema_title' => 'schema_a' ],
+			'anyConstraints' => self::EVENTGATE_MAIN_ANY_CONSTRAINTS,
+			'expectedStreams' => [ 'legacy_only', 'legacy_and_producer' ],
+		];
+
+		yield 'any constraints and target streams' => [
+			'targetStreams' => [ 'producer_only', 'other_service' ],
+			'constraints' => null,
+			'anyConstraints' => self::EVENTGATE_MAIN_ANY_CONSTRAINTS,
+			'expectedStreams' => [ 'producer_only' ],
+		];
+
+		yield 'any constraints with no match' => [
+			'targetStreams' => null,
+			'constraints' => null,
+			'anyConstraints' => [
+				[ 'destination_event_service' => 'eventgate-logging-external' ],
 			],
-			[
-				[ 'nonya' ],
-				[
-					'destination_event_service' => 'eventgate-analytics',
-				],
-			]
+			'expectedStreams' => [],
+		];
+
+		yield 'null any constraints do not filter' => [
+			'targetStreams' => null,
+			'constraints' => null,
+			'anyConstraints' => null,
+			'expectedStreams' => [ 'legacy_only', 'producer_only', 'legacy_and_producer', 'other_service' ],
+		];
+
+		yield 'empty any constraints do not filter' => [
+			'targetStreams' => null,
+			'constraints' => null,
+			'anyConstraints' => [],
+			'expectedStreams' => [ 'legacy_only', 'producer_only', 'legacy_and_producer', 'other_service' ],
 		];
 	}
 
 	/**
-	 * @dataProvider getDeprecatedParameterProvider
+	 * @dataProvider provideGetAnySettingsConstraints
 	 */
-	public function testGetDeprecatedParameter( array $streamNames, ?array $constraints = null ) {
-		$this->expectDeprecationAndContinue( '/\$includeAllSettings parameter is deprecated/' );
+	public function testGetAnySettingsConstraints(
+		?array $targetStreams,
+		?array $constraints,
+		?array $anyConstraints,
+		array $expectedStreams
+	) {
+		$streamConfigs = new StreamConfigs(
+			self::ANY_CONSTRAINTS_STREAM_CONFIGS_FIXTURE,
+			[],
+			new NullLogger()
+		);
 
-		$this->streamConfigs->get( $streamNames, true, $constraints );
+		$result = $streamConfigs->get( $targetStreams, $constraints, $anyConstraints );
+		$this->assertSame( $expectedStreams, array_keys( $result ) );
+	}
+
+	public function testGetAnySettingsConstraintsRejectsFlatConstraints() {
+		// The third argument must be a list of constraint arrays. A flat array of constraints is not valid.
+		$this->expectException( ParameterElementTypeException::class );
+
+		$this->streamConfigs->get(
+			null,
+			null,
+			[ 'destination_event_service' => 'eventgate-main' ]
+		);
 	}
 }

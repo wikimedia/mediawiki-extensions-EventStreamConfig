@@ -55,7 +55,7 @@ $wgEventStreams = [
 
 ### Getting configs for a list of streams
 
-`StreamConfigs#get` takes a list of stream names to return configs for. The `$wgEventStreams` array is searched in order for the first `stream` that matches. The return value is a map from requested stream name to the matched stream config. By default any settings in StreamConfig::INTERNAL_SETTINGS are removed from the returned stream configs; as they are often not useful for client side configuration.\ The `$includeAllSettings` parameter disables this behavior.
+`StreamConfigs#get` takes a list of stream names to return configs for. The `$wgEventStreams` array is searched in order for the first `stream` that matches. The return value is a map from requested stream name to the matched stream config, with all of its settings.
 
 Example:
 
@@ -129,7 +129,6 @@ streams that have `schema_title == 'mediawiki/edit'`, then you can provide this 
 ```php
 $streamConfigs->get(
     null,
-    /* $includeAllSettings = */ true,
     [
         'schema_title' => 'mediawiki/edit',
     ]
@@ -143,7 +142,6 @@ streams by providing a constraint like so:
 ```php
 $streamConfigs->get(
     null,
-    /* $includeAllSettings = */ true,
     [
         'producers' => [
             'mwext_eventlogging' => true,
@@ -171,3 +169,30 @@ though, as PHP is weird:
 So, when providing boolean constraints via the HTTP API, you should use the pre-casted string values
 that PHP casts booleans to.  E.g. instead of `true`, use `"1"`, and instead of `false`, use `""`.
 
+
+### Matching one of several constraints (OR)
+
+`constraints` are ANDed: a stream config must match every one of them. To match stream configs
+that have *one or more* of several settings, use `any_constraints` in the HTTP API, or the third
+`$anySettingsConstraints` parameter of `StreamConfigs#get` in PHP. Each `|`-separated
+`any_constraints` value is one alternative. If both `constraints` and `any_constraints` are given,
+a stream config must match all `constraints` and at least one `any_constraints` value.
+
+For example, to get all streams that EventBus produces to `eventgate-main`, using either the
+`producers.mediawiki_eventbus.event_service_name` setting or the legacy top level
+`destination_event_service` setting:
+
+```
+curl 'http://wiki.domain.org/w/api.php?action=streamconfigs&format=json&any_constraints=destination_event_service=eventgate-main|producers[mediawiki_eventbus][event_service_name]=eventgate-main'
+```
+
+```php
+$streamConfigs->get(
+    null,
+    null,
+    [
+        [ 'destination_event_service' => 'eventgate-main' ],
+        [ 'producers' => [ 'mediawiki_eventbus' => [ 'event_service_name' => 'eventgate-main' ] ] ],
+    ]
+);
+```

@@ -34,6 +34,18 @@ class ApiStreamConfigsTest extends ApiTestCase {
 					],
 				],
 			],
+			'legacy_service' => [
+				StreamConfig::STREAM_SETTING => 'legacy_service',
+				'destination_event_service' => 'eventgate-main',
+			],
+			'producer_service' => [
+				StreamConfig::STREAM_SETTING => 'producer_service',
+				'producers' => [
+					'mediawiki_eventbus' => [
+						'event_service_name' => 'eventgate-main',
+					],
+				],
+			],
 		] );
 	}
 
@@ -82,6 +94,41 @@ class ApiStreamConfigsTest extends ApiTestCase {
 		$result = $this->doApiRequest( [
 			'action' => 'streamconfigs',
 			'constraints' => 'foo=true',
+		] );
+		$streams = $result[0]['streams'];
+
+		$this->assertCount( 0, $streams );
+	}
+
+	public function testAnyConstraints(): void {
+		$result = $this->doApiRequest( [
+			'action' => 'streamconfigs',
+			'any_constraints' => 'destination_event_service=eventgate-main' .
+				'|producers[mediawiki_eventbus][event_service_name]=eventgate-main',
+		] );
+		$streams = $result[0]['streams'];
+
+		$this->assertSame( [ 'legacy_service', 'producer_service' ], array_keys( $streams ) );
+
+		// ---
+
+		// The API applies constraints and any_constraints together.
+		$result = $this->doApiRequest( [
+			'action' => 'streamconfigs',
+			'constraints' => 'destination_event_service=eventgate-main',
+			'any_constraints' => 'destination_event_service=eventgate-main' .
+				'|producers[mediawiki_eventbus][event_service_name]=eventgate-main',
+		] );
+		$streams = $result[0]['streams'];
+
+		$this->assertSame( [ 'legacy_service' ], array_keys( $streams ) );
+
+		// ---
+
+		$result = $this->doApiRequest( [
+			'action' => 'streamconfigs',
+			'any_constraints' => 'destination_event_service=eventgate-analytics' .
+				'|producers[mediawiki_eventbus][event_service_name]=eventgate-analytics',
 		] );
 		$streams = $result[0]['streams'];
 

@@ -6,6 +6,7 @@ use Generator;
 use InvalidArgumentException;
 use MediaWikiUnitTestCase;
 use TypeError;
+use Wikimedia\Assert\ParameterElementTypeException;
 
 /**
  * @covers \MediaWiki\Extension\EventStreamConfig\StreamConfig
@@ -403,6 +404,32 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 			],
 			'expected' => false,
 		];
+
+		// A list constraint must not stop the match of the remaining keys.
+		// Here, the list constraint matches but the next key does not match.
+		yield 'list constraint then non-matching sibling' => [
+			'constraints' => [
+				'producers' => [
+					'qux_producer' => [
+						'world',
+					],
+					'bar_producer' => false,
+				],
+			],
+			'expected' => false,
+		];
+
+		yield 'list constraint then matching sibling' => [
+			'constraints' => [
+				'producers' => [
+					'qux_producer' => [
+						'world',
+					],
+					'bar_producer' => true,
+				],
+			],
+			'expected' => true,
+		];
 	}
 
 	/**
@@ -445,6 +472,109 @@ class StreamConfigTest extends MediaWikiUnitTestCase {
 
 		$streamConfig = new StreamConfig( '/^mediawiki\.job\..+/', $settings );
 		$this->assertTrue( $streamConfig->matchesSettings( $constraints ) );
+	}
+
+	public function testMatchesSettingsTopLevelListConstraintThenNonMatchingSibling() {
+		$settings = [
+			'schema_title' => 'mediawiki/nonya',
+			'topics' => [ 'eqiad.nonya', 'codfw.nonya' ],
+		];
+
+		$constraints = [
+			'topics' => [ 'eqiad.nonya' ],
+			'schema_title' => 'mediawiki/other',
+		];
+
+		$streamConfig = new StreamConfig( 'nonya', $settings );
+		$this->assertFalse( $streamConfig->matchesSettings( $constraints ) );
+	}
+
+	public static function provideMatchesAnySettings(): Generator {
+		yield 'legacy key does not match, producer key matches' => [
+			'anyConstraints' => [
+				[ 'destination_event_service' => 'eventgate-main' ],
+				[ 'producers' => [ 'mediawiki_eventbus' => [ 'event_service_name' => 'eventgate-main' ] ] ],
+			],
+			'expected' => true,
+		];
+
+		yield 'producer key matches first' => [
+			'anyConstraints' => [
+				[ 'producers' => [ 'mediawiki_eventbus' => [ 'event_service_name' => 'eventgate-main' ] ] ],
+				[ 'destination_event_service' => 'eventgate-main' ],
+			],
+			'expected' => true,
+		];
+
+		yield 'no item matches' => [
+			'anyConstraints' => [
+				[ 'destination_event_service' => 'eventgate-main' ],
+				[ 'producers' => [ 'mediawiki_eventbus' => [ 'event_service_name' => 'eventgate-analytics' ] ] ],
+			],
+			'expected' => false,
+		];
+
+		yield 'empty list' => [
+			'anyConstraints' => [],
+			'expected' => false,
+		];
+
+		yield 'all keys in one item must match' => [
+			'anyConstraints' => [
+				[
+					'producers' => [ 'mediawiki_eventbus' => [ 'event_service_name' => 'eventgate-main' ] ],
+					'schema_title' => 'mediawiki/other',
+				],
+			],
+			'expected' => false,
+		];
+
+		yield 'stream constraint in an item matches' => [
+			'anyConstraints' => [
+				[ 'stream' => 'other' ],
+				[ 'stream' => 'nonya' ],
+			],
+			'expected' => true,
+		];
+
+		yield 'stream constraint in an item does not match' => [
+			'anyConstraints' => [
+				[ 'stream' => 'other' ],
+			],
+			'expected' => false,
+		];
+	}
+
+	/**
+	 * @dataProvider provideMatchesAnySettings
+	 */
+	public function testMatchesAnySettings( array $anyConstraints, bool $expected ) {
+		// This stream uses only the producers.mediawiki_eventbus.event_service_name setting.
+		// It does not have the legacy destination_event_service setting.
+		$settings = [
+			'schema_title' => 'mediawiki/nonya',
+			'producers' => [
+				'mediawiki_eventbus' => [
+					'event_service_name' => 'eventgate-main',
+				],
+			],
+		];
+
+		$streamConfig = new StreamConfig( 'nonya', $settings );
+		$this->assertSame( $expected, $streamConfig->matchesAnySettings( $anyConstraints ) );
+	}
+
+	public function testMatchesAnySettingsRejectsFlatConstraints() {
+		$settings = [
+			'schema_title' => 'mediawiki/nonya',
+			'destination_event_service' => 'eventgate-main',
+		];
+
+		$streamConfig = new StreamConfig( 'nonya', $settings );
+
+		// Each item must be an array of constraints. A flat array of constraints is not valid.
+		$this->expectException( ParameterElementTypeException::class );
+		$streamConfig->matchesAnySettings( [ 'destination_event_service' => 'eventgate-main' ] );
 	}
 
 	public function testTopicsWithExplicitTopicsSetting() {

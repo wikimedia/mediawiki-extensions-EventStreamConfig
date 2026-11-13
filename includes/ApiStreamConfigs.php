@@ -44,9 +44,23 @@ class ApiStreamConfigs extends ApiBase {
 	private const API_PARAM_CONSTRAINTS = 'constraints';
 
 	/**
-	 * @deprecated since 1.41
+	 * API query param that limits the results to the stream config entries
+	 * that match one or more of these constraints.
+	 * Each item in the multi value is one alternative constraint. For example:
+	 *   any_constraints=destination_event_service=eventgate-main|
+	 *     producers[mediawiki_eventbus][event_service_name]=eventgate-main
+	 * Without the line break, the API parses this value into:
+	 * @code
+	 *   [
+	 *       [ 'destination_event_service' => 'eventgate-main' ],
+	 *       [ 'producers' => [ 'mediawiki_eventbus' => [ 'event_service_name' => 'eventgate-main' ] ] ],
+	 *   ]
+	 * @endcode
+	 *
+	 * A stream config entry must match all API_PARAM_CONSTRAINTS and one or more
+	 * API_PARAM_ANY_CONSTRAINTS.
 	 */
-	private const API_PARAM_ALL_SETTINGS = 'all_settings';
+	private const API_PARAM_ANY_CONSTRAINTS = 'any_constraints';
 
 	/**
 	 * @inheritDoc
@@ -57,8 +71,10 @@ class ApiStreamConfigs extends ApiBase {
 
 		$targetStreams = $this->getParameter( self::API_PARAM_STREAMS );
 		$constraints = $this->getParameter( self::API_PARAM_CONSTRAINTS );
+		$anyConstraints = $this->getParameter( self::API_PARAM_ANY_CONSTRAINTS );
 
 		$settingsConstraints = $constraints ? self::multiParamToAssocArray( $constraints ) : null;
+		$anySettingsConstraints = $anyConstraints ? self::multiParamToListOfAssocArrays( $anyConstraints ) : null;
 
 		$streamConfigs = MediaWikiServices::getInstance()->getService(
 			'EventStreamConfig.StreamConfigs'
@@ -66,7 +82,8 @@ class ApiStreamConfigs extends ApiBase {
 
 		$result = $streamConfigs->get(
 			$targetStreams,
-			$settingsConstraints
+			$settingsConstraints,
+			$anySettingsConstraints
 		);
 
 		// Ensure that empty stream configs are serialized as objects ({}) and not as lists ([]).
@@ -94,9 +111,8 @@ class ApiStreamConfigs extends ApiBase {
 			self::API_PARAM_CONSTRAINTS => [
 				ParamValidator::PARAM_ISMULTI => true,
 			],
-			self::API_PARAM_ALL_SETTINGS => [
-				ParamValidator::PARAM_DEPRECATED => true,
-				ParamValidator::PARAM_TYPE => 'boolean',
+			self::API_PARAM_ANY_CONSTRAINTS => [
+				ParamValidator::PARAM_ISMULTI => true,
 			],
 		];
 	}
@@ -118,6 +134,11 @@ class ApiStreamConfigs extends ApiBase {
 			'=mediawiki.button-click' .
 			'&constraints=event_service_name=eventgate-main' =>
 					'apihelp-streamconfigs-example-3',
+
+			'action=streamconfigs&' . self::API_PARAM_ANY_CONSTRAINTS .
+			'=destination_event_service=eventgate-main' .
+			'|producers[mediawiki_eventbus][event_service_name]=eventgate-main' =>
+					'apihelp-streamconfigs-example-4',
 		];
 	}
 
@@ -152,13 +173,32 @@ class ApiStreamConfigs extends ApiBase {
 	 * @param array $multiParamArray List of key=val string pairs
 	 * @return array
 	 */
-	private static function multiParamToAssocArray( array $multiParamArray ) {
-		return array_reduce(
-			$multiParamArray,
-			static function ( $carry, $elementString ) {
-				return array_merge_recursive( $carry, wfCgiToArray( $elementString ) );
-			},
-			[]
-		);
+	private static function multiParamToAssocArray( array $multiParamArray ): array {
+		return array_merge_recursive( ...self::multiParamToListOfAssocArrays( $multiParamArray ) );
+	}
+
+	/**
+	 * Parses a MULTI PARAM value into a list of assoc arrays.
+	 * Each item stays a separate assoc array. This function does not merge the items.
+	 *
+	 * For example, this function parses the query string parameter
+	 * "my_param=key1=val1|key2[key3]=val2" into:
+	 *
+	 * ```
+	 * [
+	 *     [ 'key1' => 'val1' ],
+	 *     [ 'key2' => [ 'key3' => 'val2' ] ],
+	 * ]
+	 * ```
+	 *
+	 * @param array $multiParamArray List of key=val string pairs
+	 * @return array[]
+	 */
+	private static function multiParamToListOfAssocArrays( array $multiParamArray ): array {
+		// `wfCgiToArray( ... )` makes a closure that calls wfCgiToArray with the same arguments.
+		// `...` is part of the syntax.
+		// wfCgiToArray parses one query string into a nested array. It also URL-decodes each key and value.
+		// For example, "key2[key3]=val2" becomes [ 'key2' => [ 'key3' => 'val2' ] ].
+		return array_map( wfCgiToArray( ... ), $multiParamArray );
 	}
 }
