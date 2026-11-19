@@ -9,7 +9,9 @@
 	"apihelp-streamconfigs-summary": "이벤트 스트림 구성을 노출합니다. formatversion=2의 format=json만 반환합니다.",
 	"apihelp-streamconfigs-param-streams": "구성을 가져올 스트림 목록",
 	"apihelp-streamconfigs-param-constraints": "이 설정들을 가진 스트림 구성 항목의 결과를 필터링합니다",
+	"apihelp-streamconfigs-param-any_constraints": "하나 이상의 이 설정들을 가진 스트림 구성 항목의 결과를 필터링합니다. <var>constraints</var>와 같이 사용될 수 있습니다.",
 	"apihelp-streamconfigs-example-1": "스트림 목록의 스트림 구성을 가져옵니다",
 	"apihelp-streamconfigs-example-2": "모든 설정의 스트림의 스트림 구성을 가져옵니다",
-	"apihelp-streamconfigs-example-3": "이 제약과 일치하는 설정을 가진 스트림의 스트림 구성을 가져옵니다"
+	"apihelp-streamconfigs-example-3": "이 제약과 일치하는 설정을 가진 스트림의 스트림 구성을 가져옵니다",
+	"apihelp-streamconfigs-example-4": "하나 이상의 이 제약과 일치하는 설정을 가진 스트림의 스트림 구성을 가져옵니다"
 }
